@@ -103,7 +103,7 @@ class cf_stacker(BaseEstimator):
             self.H = self.nmf_train.components_
         return self
 
-    def predict(self, X, method='mean', return_prob=self.return_prob):
+    def predict(self, X, method='mean'):
 
         if self.use_probs:
             probs_list = self.basemodel.predict_proba(X)
@@ -136,7 +136,7 @@ class cf_stacker(BaseEstimator):
                 X_predict = np.nanmean(self.X_predict_masked, axis=1)
             elif method == 'median':
                 X_predict = np.nanmedian(self.X_predict_masked, axis=1)
-        if return_prob:
+        if self.return_prob:
             return X_predict
         else:
             X_predict[X_predict > 0.5] = 1

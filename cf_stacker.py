@@ -139,7 +139,7 @@ class cf_stacker(BaseEstimator):
         else:
             X_predict[X_predict > 0.5] = 1
             X_predict[X_predict <= 0.5] = 0
-            return np.expand_dims(X_predict, axis=1)
+            return np.expand_dims(X_predict, axis=0)
 
     def _generate_basemodel(self):
         # return MultiOutputClassifier(estimator=self.base_estimator)

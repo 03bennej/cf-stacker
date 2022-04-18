@@ -76,7 +76,7 @@ class cf_stacker(BaseEstimator):
 
     def fit(self, X, y):
 
-        y = np.round(np.abs(X - np.expand_dims(y, axis=1)))
+        y = np.abs(X - np.expand_dims(y, axis=1))
         self.basemodel.fit(X, y)
 
         if self.use_probs:

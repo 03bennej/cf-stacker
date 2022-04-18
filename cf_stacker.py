@@ -71,9 +71,10 @@ class cf_stacker(BaseEstimator):
 
         
     def fit(self, X, y):
-        
+
+        y = np.abs(X_train - np.expand_dims(y, axis=1))
         self.basemodel.fit(X, y)
-        
+
         if self.use_probs:
             probs_list = self.basemodel.predict_proba(X)
             self.mask_train = list_to_matrix(probs_list)

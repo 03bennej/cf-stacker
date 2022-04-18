@@ -70,7 +70,7 @@ class cf_stacker(BaseEstimator):
         self.max_iter_nmf = max_iter_nmf
         self.use_probs = use_probs
         self.nmf = nmf
-        self.return_probs = return_prob
+        self.return_probs = return_probs
 
         self.basemodel = self._generate_basemodel()
 

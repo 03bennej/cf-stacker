@@ -99,6 +99,7 @@ class cf_stacker(BaseEstimator):
                                                         W=np.random.rand(X.shape[0], self.latent_dimension),
                                                         H=np.random.rand(self.latent_dimension, X.shape[1], ))
             self.H = self.nmf_train.components_
+        return self
 
     def predict(self, X, method='mean', return_prob=False):
 

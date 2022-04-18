@@ -60,7 +60,8 @@ class cf_stacker(BaseEstimator):
                  alpha_nmf=0.0,
                  max_iter_nmf=500,
                  use_probs=False,
-                 nmf=True):
+                 nmf=True,
+                 return_prob=False):
 
         self.base_estimator = base_estimator
         self.threshold = threshold
@@ -69,6 +70,7 @@ class cf_stacker(BaseEstimator):
         self.max_iter_nmf = max_iter_nmf
         self.use_probs = use_probs
         self.nmf = nmf
+        self.return_prob = return_prob
 
         self.basemodel = self._generate_basemodel()
 
@@ -101,7 +103,7 @@ class cf_stacker(BaseEstimator):
             self.H = self.nmf_train.components_
         return self
 
-    def predict(self, X, method='mean', return_prob=False):
+    def predict(self, X, method='mean', return_prob=self.return_prob):
 
         if self.use_probs:
             probs_list = self.basemodel.predict_proba(X)

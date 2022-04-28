@@ -27,14 +27,9 @@ def print_metrics(y_true, y_pred):
 def remove_unreliable_entries(data,
                               unreliable_entries,
                               threshold=0.5,
-                              use_probs=False,
                               target=np.nan):
     data_new = np.copy(data)
     data_new[unreliable_entries > threshold] = target
-    # if use_probs:
-    #     data_new[unreliable_entries > threshold] = target   
-    # else:
-    #     data_new[unreliable_entries == 1] = target
     return data_new
 
 

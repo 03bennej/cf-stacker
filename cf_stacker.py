@@ -92,9 +92,11 @@ class cf_stacker(BaseEstimator):
                                  solver='mu',
                                  alpha=self.alpha_nmf,
                                  update_H=True)
+            np.random.seed(73584); W_init = np.random.rand(X.shape[0], self.latent_dimension)
+            np.random.seed(73584); H_init = np.random.rand(self.latent_dimension, X.shape[1])
             self.W_train = self.nmf_train.fit_transform(self.X_train_masked,
-                                                        W=np.random.rand(X.shape[0], self.latent_dimension),
-                                                        H=np.random.rand(self.latent_dimension, X.shape[1]))
+                                                        W=W_init,
+                                                        H=H_init)
             self.H = self.nmf_train.components_
         return self
 
@@ -117,8 +119,9 @@ class cf_stacker(BaseEstimator):
                                    solver='mu',
                                    alpha=self.alpha_nmf,
                                    update_H=False)
+            np.random.seed(73584); W_init = np.random.rand(X.shape[0], self.latent_dimension)
             self.W_predict = self.nmf_predict.fit_transform(self.X_predict_masked,
-                                                            W=np.random.rand(X.shape[0], self.latent_dimension),
+                                                            W=W_init,
                                                             H=self.H)
 
             if self.method == 'mean':

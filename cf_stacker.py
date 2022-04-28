@@ -85,7 +85,6 @@ class cf_stacker(BaseEstimator):
 
         self.X_train_masked = remove_unreliable_entries(X,
                                                         unreliable_entries=self.mask_train,
-                                                        use_probs=self.use_probs,
                                                         threshold=self.threshold)
 
         if self.nmf:
@@ -111,7 +110,6 @@ class cf_stacker(BaseEstimator):
 
         self.X_predict_masked = remove_unreliable_entries(X,
                                                           unreliable_entries=self.mask_predict,
-                                                          use_probs=self.use_probs,
                                                           threshold=self.threshold)
 
         if self.nmf:

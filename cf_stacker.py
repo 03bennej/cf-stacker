@@ -104,7 +104,7 @@ class cf_stacker(BaseEstimator):
             self.H = self.nmf_train.components_
         return self
 
-    def predict(self, X, method='mean'):
+    def predict(self, X):
 
         if self.use_probs:
             probs_list = self.basemodel.predict_proba(X)

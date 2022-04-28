@@ -100,7 +100,7 @@ class cf_stacker(BaseEstimator):
                                  update_H=True)
             self.W_train = self.nmf_train.fit_transform(self.X_train_masked,
                                                         W=np.random.rand(X.shape[0], self.latent_dimension),
-                                                        H=np.random.rand(self.latent_dimension, X.shape[1], ))
+                                                        H=np.random.rand(self.latent_dimension, X.shape[1]))
             self.H = self.nmf_train.components_
         return self
 

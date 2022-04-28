@@ -90,7 +90,6 @@ class cf_stacker(BaseEstimator):
                                  max_iter=self.max_iter_nmf,
                                  init='custom',
                                  solver='mu',
-                                 beta_loss='itakura-saito',
                                  alpha=self.alpha_nmf,
                                  update_H=True)
             self.W_train = self.nmf_train.fit_transform(self.X_train_masked,
@@ -116,7 +115,6 @@ class cf_stacker(BaseEstimator):
                                    max_iter=self.max_iter_nmf,
                                    init='custom',
                                    solver='mu',
-                                   beta_loss='itakura-saito',
                                    alpha=self.alpha_nmf,
                                    update_H=False)
             self.W_predict = self.nmf_predict.fit_transform(self.X_predict_masked,

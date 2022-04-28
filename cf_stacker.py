@@ -137,11 +137,11 @@ class cf_stacker(BaseEstimator):
                 X_predict = np.nanmean(self.X_predict_masked, axis=1)
             elif self.method == 'median':
                 X_predict = np.nanmedian(self.X_predict_masked, axis=1)
-        # if self.return_probs:
-        #     return X_predict
-        # else:
-        #     X_predict[X_predict > 0.5] = 1
-        #     X_predict[X_predict <= 0.5] = 0
+        if self.return_probs:
+            return X_predict
+        else:
+            X_predict[X_predict > 0.5] = 1
+            X_predict[X_predict <= 0.5] = 0
             return X_predict
 
     def _generate_basemodel(self):

@@ -16,8 +16,6 @@ from sklearn.svm import SVC, SVR
 from sklearn.neural_network import MLPClassifier, MLPRegressor
 from xgboost import XGBClassifier
 
-np.random.seed(31415)
-
 def print_metrics(y_true, y_pred):
     print('f1_score: ', sklearn.metrics.f1_score(y_true, y_pred))
     print('accuracy: ', sklearn.metrics.accuracy_score(y_true, y_pred))

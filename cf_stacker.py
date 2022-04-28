@@ -60,7 +60,8 @@ class cf_stacker(BaseEstimator):
                  max_iter_nmf=500,
                  use_probs=False,
                  nmf=True,
-                 return_probs=False):
+                 return_probs=False,
+                 method='mean'):
 
         self.base_estimator = base_estimator
         self.threshold = threshold
@@ -70,6 +71,7 @@ class cf_stacker(BaseEstimator):
         self.use_probs = use_probs
         self.nmf = nmf
         self.return_probs = return_probs
+        self.method = method
 
         self.basemodel = self._generate_basemodel()
 
@@ -126,14 +128,14 @@ class cf_stacker(BaseEstimator):
                                                             W=np.random.rand(X.shape[0], self.latent_dimension),
                                                             H=self.H)
 
-            if method == 'mean':
+            if self.method == 'mean':
                 X_predict = np.mean(self.W_predict @ self.H, axis=1)
-            elif method == 'median':
+            elif self.method == 'median':
                 X_predict = np.median(self.W_predict @ self.H, axis=1)
         else:
-            if method == 'mean':
+            if self.method == 'mean':
                 X_predict = np.nanmean(self.X_predict_masked, axis=1)
-            elif method == 'median':
+            elif self.method == 'median':
                 X_predict = np.nanmedian(self.X_predict_masked, axis=1)
         if self.return_probs:
             return X_predict

@@ -16,7 +16,8 @@ from sklearn.svm import SVC, SVR
 from sklearn.neural_network import MLPClassifier, MLPRegressor
 from xgboost import XGBClassifier
 
-#hello
+
+# hello
 
 def print_metrics(y_true, y_pred):
     print('f1_score: ', sklearn.metrics.f1_score(y_true, y_pred))
@@ -75,6 +76,8 @@ class cf_stacker(BaseEstimator):
     def fit(self, X, y):
 
         y = np.abs(X - np.expand_dims(y, axis=1))
+        y[y <= 0.5] = 0
+        y[y > 0.5] = 1
         self.basemodel.fit(X, y)
 
         if self.use_probs:
@@ -94,8 +97,10 @@ class cf_stacker(BaseEstimator):
                                  solver='mu',
                                  alpha=self.alpha_nmf,
                                  update_H=True)
-            np.random.seed(73584); W_init = np.random.rand(X.shape[0], self.latent_dimension)
-            np.random.seed(73584); H_init = np.random.rand(self.latent_dimension, X.shape[1])
+            np.random.seed(73584);
+            W_init = np.random.rand(X.shape[0], self.latent_dimension)
+            np.random.seed(73584);
+            H_init = np.random.rand(self.latent_dimension, X.shape[1])
             self.W_train = self.nmf_train.fit_transform(self.X_train_masked,
                                                         W=W_init,
                                                         H=H_init)
@@ -121,7 +126,8 @@ class cf_stacker(BaseEstimator):
                                    solver='mu',
                                    alpha=self.alpha_nmf,
                                    update_H=False)
-            np.random.seed(73584); W_init = np.random.rand(X.shape[0], self.latent_dimension)
+            np.random.seed(73584);
+            W_init = np.random.rand(X.shape[0], self.latent_dimension)
             self.W_predict = self.nmf_predict.fit_transform(self.X_predict_masked,
                                                             W=W_init,
                                                             H=self.H)

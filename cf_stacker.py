@@ -102,7 +102,7 @@ class cf_stacker(BaseEstimator):
             self.H = self.nmf_train.components_
         return self
 
-    def predict(self, X):
+    def predict_proba(self, X):
 
         if self.use_probs:
             probs_list = self.basemodel.predict_proba(X)
@@ -143,8 +143,8 @@ class cf_stacker(BaseEstimator):
             return X_predict
 
     def _generate_basemodel(self):
-        # return MultiOutputClassifier(estimator=self.base_estimator)
-        return MultiOutputRegressor(estimator=self.base_estimator)
+        return MultiOutputClassifier(estimator=self.base_estimator)
+        # return MultiOutputRegressor(estimator=self.base_estimator)
 
 
 if __name__ == "__main__":

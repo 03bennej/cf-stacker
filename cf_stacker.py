@@ -29,14 +29,9 @@ def print_metrics(y_true, y_pred):
 def remove_unreliable_entries(data,
                               unreliable_entries,
                               threshold=0.5,
-                              use_probs=False,
                               target=np.nan):
     data_new = np.copy(data)
     data_new[unreliable_entries > threshold] = target
-    # if use_probs:
-    #     data_new[unreliable_entries > threshold] = target   
-    # else:
-    #     data_new[unreliable_entries == 1] = target
     return data_new
 
 
@@ -62,7 +57,8 @@ class cf_stacker(BaseEstimator):
                  max_iter_nmf=500,
                  use_probs=False,
                  nmf=True,
-                 return_probs=False):
+                 return_probs=False,
+                 method='mean'):
 
         self.base_estimator = base_estimator
         self.threshold = threshold
@@ -72,6 +68,7 @@ class cf_stacker(BaseEstimator):
         self.use_probs = use_probs
         self.nmf = nmf
         self.return_probs = return_probs
+        self.method = method
 
         self.basemodel = self._generate_basemodel()
 
@@ -88,7 +85,6 @@ class cf_stacker(BaseEstimator):
 
         self.X_train_masked = remove_unreliable_entries(X,
                                                         unreliable_entries=self.mask_train,
-                                                        use_probs=self.use_probs,
                                                         threshold=self.threshold)
 
         if self.nmf:
@@ -98,13 +94,15 @@ class cf_stacker(BaseEstimator):
                                  solver='mu',
                                  alpha=self.alpha_nmf,
                                  update_H=True)
+            np.random.seed(73584); W_init = np.random.rand(X.shape[0], self.latent_dimension)
+            np.random.seed(73584); H_init = np.random.rand(self.latent_dimension, X.shape[1])
             self.W_train = self.nmf_train.fit_transform(self.X_train_masked,
-                                                        W=np.random.rand(X.shape[0], self.latent_dimension),
-                                                        H=np.random.rand(self.latent_dimension, X.shape[1], ))
+                                                        W=W_init,
+                                                        H=H_init)
             self.H = self.nmf_train.components_
         return self
 
-    def predict(self, X, method='mean'):
+    def predict(self, X):
 
         if self.use_probs:
             probs_list = self.basemodel.predict_proba(X)
@@ -114,7 +112,6 @@ class cf_stacker(BaseEstimator):
 
         self.X_predict_masked = remove_unreliable_entries(X,
                                                           unreliable_entries=self.mask_predict,
-                                                          use_probs=self.use_probs,
                                                           threshold=self.threshold)
 
         if self.nmf:
@@ -124,18 +121,19 @@ class cf_stacker(BaseEstimator):
                                    solver='mu',
                                    alpha=self.alpha_nmf,
                                    update_H=False)
+            np.random.seed(73584); W_init = np.random.rand(X.shape[0], self.latent_dimension)
             self.W_predict = self.nmf_predict.fit_transform(self.X_predict_masked,
-                                                            W=np.random.rand(X.shape[0], self.latent_dimension),
+                                                            W=W_init,
                                                             H=self.H)
 
-            if method == 'mean':
+            if self.method == 'mean':
                 X_predict = np.mean(self.W_predict @ self.H, axis=1)
-            elif method == 'median':
+            elif self.method == 'median':
                 X_predict = np.median(self.W_predict @ self.H, axis=1)
         else:
-            if method == 'mean':
+            if self.method == 'mean':
                 X_predict = np.nanmean(self.X_predict_masked, axis=1)
-            elif method == 'median':
+            elif self.method == 'median':
                 X_predict = np.nanmedian(self.X_predict_masked, axis=1)
         if self.return_probs:
             return X_predict

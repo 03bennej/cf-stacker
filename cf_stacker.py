@@ -144,7 +144,7 @@ class CFStacker(BaseEstimator):
             elif self.method == 'median':
                 X_predict = np.median(self.W_predict @ self.H, axis=1)
             elif self.method == 'lr':
-                X_predict = self.output_model.predict_proba(self.W_predict @ self.H)[1]
+                X_predict = self.output_model.predict_proba(self.W_predict @ self.H)[:, 1]
         else:
             if self.method == 'mean':
                 X_predict = np.nanmean(self.X_predict_masked, axis=1)

@@ -96,17 +96,17 @@ class cf_stacker(BaseEstimator):
         if self.nmf:
             self.nmf_train = NMF(n_components=self.latent_dimension,
                                  max_iter=self.max_iter_nmf,
-                                 init='custom',
+                                 init='random',
                                  solver='mu',
                                  tol=self.tol_nmf,
                                  l1_ratio=self.l1_ratio,
                                  alpha=self.alpha_nmf,
                                  update_H=True)
-            np.random.seed(73584); W_init = 0.01*np.random.rand(X.shape[0], self.latent_dimension)
-            np.random.seed(73584); H_init = 0.01*np.random.rand(self.latent_dimension, X.shape[1])
-            self.W_train = self.nmf_train.fit_transform(self.X_train_masked,
-                                                        W=W_init,
-                                                        H=H_init)
+            np.random.seed(73584); W_init = np.random.rand(X.shape[0], self.latent_dimension)
+            np.random.seed(73584); H_init = np.random.rand(self.latent_dimension, X.shape[1])
+            self.W_train = self.nmf_train.fit_transform(self.X_train_masked)#,
+                                                        #W=W_init,
+                                                        #H=H_init)
             self.H = self.nmf_train.components_
         return self
 

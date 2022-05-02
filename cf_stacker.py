@@ -149,8 +149,8 @@ class cf_stacker(BaseEstimator):
             return X_predict
 
     def _generate_basemodel(self):
-        return MultiOutputClassifier(estimator=self.base_estimator)
-        # return MultiOutputRegressor(estimator=self.base_estimator)
+        # return MultiOutputClassifier(estimator=self.base_estimator)
+        return MultiOutputRegressor(estimator=self.base_estimator)
 
 
 if __name__ == "__main__":

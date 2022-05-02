@@ -130,12 +130,11 @@ class cf_stacker(BaseEstimator):
                                    tol=self.tol_nmf,
                                    l1_ratio=self.l1_ratio,
                                    alpha=self.alpha_nmf,
-                                   update_H=True)
+                                   update_H=False)
             np.random.seed(73584); W_init = np.random.rand(X.shape[0], self.latent_dimension)
-            np.random.seed(73584); H_init = np.random.rand(self.latent_dimension, X.shape[1])
             self.W_predict = self.nmf_predict.fit_transform(self.X_predict_masked,
                                                             W=W_init,
-                                                            H=H_init)
+                                                            H=self.H)
 
             if self.method == 'mean':
                 X_predict = np.mean(self.W_predict @ self.H, axis=1)

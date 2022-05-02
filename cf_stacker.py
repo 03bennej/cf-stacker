@@ -108,6 +108,9 @@ class cf_stacker(BaseEstimator):
                                                         W=W_init,
                                                         H=H_init)
             self.H = self.nmf_train.components_
+
+        self.output_model = LogisticRegression()
+        self.output_model.fit(X, y)
         return self
 
     def predict(self, X):

@@ -87,6 +87,8 @@ class CFStacker(BaseEstimator):
     def fit(self, X, y):
 
         unreliable_probs = np.abs(X - np.expand_dims(y, axis=1))
+        unreliable_probs[unreliable_probs >= 0.5] = 1
+        unreliable_probs[unreliable_probs < 0.5] = 0
 
         self.basemodel.fit(X, unreliable_probs)
 

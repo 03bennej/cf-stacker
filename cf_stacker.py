@@ -94,7 +94,7 @@ class cf_stacker(BaseEstimator):
                                                         threshold=self.threshold)
 
         if self.nmf:
-            self.wh_scale = 1#np.sqrt(np.mean(np.array(X)) / self.latent_dimension)
+            self.wh_scale = np.sqrt(np.mean(np.array(X)) / self.latent_dimension)
 
             self.nmf_train = NMF(n_components=self.latent_dimension,
                                  max_iter=self.max_iter_nmf,

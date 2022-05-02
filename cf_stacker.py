@@ -45,7 +45,7 @@ def list_to_matrix(probs_list):
     return matrix
 
 
-class cf_stacker(BaseEstimator):
+class CFStacker(BaseEstimator):
 
     def __init__(self,
                  base_estimator,

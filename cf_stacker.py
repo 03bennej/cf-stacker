@@ -73,15 +73,14 @@ class cf_stacker(BaseEstimator):
         self.method = method
 
         self.basemodel = self._generate_basemodel()
+        if self.method == 'lr':
+            self.output_model = LogisticRegression()
 
     def fit(self, X, y):
 
-        #y = np.abs(X - np.expand_dims(y, axis=1))
-        y = X - np.expand_dims(y, axis=1)
-        y[y >= 0.5] = 1
-        y[y < 0.5] = 0
+        unreliable_probs = np.abs(X - np.expand_dims(y, axis=1))
 
-        self.basemodel.fit(X, y)
+        self.basemodel.fit(X, unreliable_probs)
 
         if self.use_probs:
             probs_list = self.basemodel.predict_proba(X)
@@ -108,9 +107,8 @@ class cf_stacker(BaseEstimator):
                                                         W=W_init,
                                                         H=H_init)
             self.H = self.nmf_train.components_
-
-        self.output_model = LogisticRegression()
-        self.output_model.fit(X, y)
+        if self.method == 'lr':
+            self.output_model.fit(self.W_train @ self.H, y)
         return self
 
     def predict(self, X):
@@ -143,6 +141,8 @@ class cf_stacker(BaseEstimator):
                 X_predict = np.mean(self.W_predict @ self.H, axis=1)
             elif self.method == 'median':
                 X_predict = np.median(self.W_predict @ self.H, axis=1)
+            elif self.method == 'lr':
+                X_predict = self.output_model.predict(self.W_predict @ self.H)
         else:
             if self.method == 'mean':
                 X_predict = np.nanmean(self.X_predict_masked, axis=1)

@@ -53,6 +53,8 @@ class cf_stacker(BaseEstimator):
                  threshold=0.5,
                  alpha_nmf=0.0,
                  max_iter_nmf=500,
+                 tol_nmf=1e-4,
+                 l1_ratio_nmf=0.0,
                  use_probs=False,
                  nmf=True,
                  return_probs=False,
@@ -63,6 +65,8 @@ class cf_stacker(BaseEstimator):
         self.latent_dimension = latent_dimension
         self.alpha_nmf = alpha_nmf
         self.max_iter_nmf = max_iter_nmf
+        self.tol_nmf = tol_nmf
+        self.l1_ratio = l1_ratio_nmf
         self.use_probs = use_probs
         self.nmf = nmf
         self.return_probs = return_probs
@@ -94,6 +98,8 @@ class cf_stacker(BaseEstimator):
                                  max_iter=self.max_iter_nmf,
                                  init='custom',
                                  solver='mu',
+                                 tol=self.tol_nmf,
+                                 l1_ratio=self.l1_ratio,
                                  alpha=self.alpha_nmf,
                                  update_H=True)
             np.random.seed(73584); W_init = np.random.rand(X.shape[0], self.latent_dimension)
@@ -121,6 +127,8 @@ class cf_stacker(BaseEstimator):
                                    max_iter=self.max_iter_nmf,
                                    init='custom',
                                    solver='mu',
+                                   tol=self.tol_nmf,
+                                   l1_ratio=self.l1_ratio,
                                    alpha=self.alpha_nmf,
                                    update_H=False)
             np.random.seed(73584); W_init = np.random.rand(X.shape[0], self.latent_dimension)

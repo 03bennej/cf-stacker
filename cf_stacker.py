@@ -102,8 +102,8 @@ class cf_stacker(BaseEstimator):
                                  l1_ratio=self.l1_ratio,
                                  alpha=self.alpha_nmf,
                                  update_H=True)
-            W_init = np.random.rand(X.shape[0], self.latent_dimension) * np.sqrt(np.mean(np.flatten(X)) / self.latent_dimension)
-            H_init = np.random.rand(self.latent_dimension, X.shape[1]) * np.sqrt(np.mean(np.flatten(X)) / self.latent_dimension)
+            W_init = np.random.rand(X.shape[0], self.latent_dimension) * np.sqrt(np.mean(np.array(X)) / self.latent_dimension)
+            H_init = np.random.rand(self.latent_dimension, X.shape[1]) * np.sqrt(np.mean(np.array(X)) / self.latent_dimension)
             self.W_train = self.nmf_train.fit_transform(self.X_train_masked,
                                                         W=W_init,
                                                         H=H_init)
@@ -131,7 +131,7 @@ class cf_stacker(BaseEstimator):
                                    l1_ratio=self.l1_ratio,
                                    alpha=self.alpha_nmf,
                                    update_H=False)
-            W_init = np.random.rand(X.shape[0], self.latent_dimension) * np.sqrt(np.mean(np.flatten(X)) / self.latent_dimension)
+            W_init = np.random.rand(X.shape[0], self.latent_dimension) * np.sqrt(np.mean(np.array(X)) / self.latent_dimension)
             self.W_predict = self.nmf_predict.fit_transform(self.X_predict_masked,
                                                             W=W_init,
                                                             H=self.H)

@@ -55,7 +55,6 @@ class cf_stacker(BaseEstimator):
                  max_iter_nmf=500,
                  tol_nmf=1e-4,
                  l1_ratio_nmf=0.0,
-                 use_probs=False,
                  nmf=True,
                  return_probs=False,
                  method='mean'):
@@ -67,7 +66,6 @@ class cf_stacker(BaseEstimator):
         self.max_iter_nmf = max_iter_nmf
         self.tol_nmf = tol_nmf
         self.l1_ratio = l1_ratio_nmf
-        self.use_probs = use_probs
         self.nmf = nmf
         self.return_probs = return_probs
         self.method = method
@@ -92,11 +90,7 @@ class cf_stacker(BaseEstimator):
 
         self.basemodel.fit(X, unreliable_probs)
 
-        if self.use_probs:
-            probs_list = self.basemodel.predict_proba(X)
-            self.mask_train = list_to_matrix(probs_list)
-        else:
-            self.mask_train = self.basemodel.predict(X)
+        self.mask_train = self.basemodel.predict(X)
 
         self.X_train_masked = remove_unreliable_entries(X,
                                                         unreliable_entries=self.mask_train,
@@ -123,11 +117,7 @@ class cf_stacker(BaseEstimator):
 
     def predict(self, X):
 
-        if self.use_probs:
-            probs_list = self.basemodel.predict_proba(X)
-            self.mask_predict = list_to_matrix(probs_list)
-        else:
-            self.mask_predict = self.basemodel.predict(X)
+        self.mask_predict = self.basemodel.predict(X)
 
         self.X_predict_masked = remove_unreliable_entries(X,
                                                           unreliable_entries=self.mask_predict,

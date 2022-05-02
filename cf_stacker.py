@@ -74,8 +74,8 @@ class cf_stacker(BaseEstimator):
 
         #y = np.abs(X - np.expand_dims(y, axis=1))
         y = X - np.expand_dims(y, axis=1)
-        y[y >= 0.6] = 1
-        y[y < 0.6] = 0
+        y[y >= 0.5] = 1
+        y[y < 0.5] = 0
 
         self.basemodel.fit(X, y)
 

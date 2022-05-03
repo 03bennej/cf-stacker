@@ -150,6 +150,8 @@ class CFStacker(BaseEstimator):
                 X_predict = np.nanmean(self.X_predict_masked, axis=1)
             elif self.method == 'median':
                 X_predict = np.nanmedian(self.X_predict_masked, axis=1)
+            elif self.method == 'lr':
+                X_predict = self.output_model.predict_proba(self.W_predict @ self.H)[:, 1]
         if self.return_probs:
             return X_predict
         else:

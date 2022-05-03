@@ -113,8 +113,8 @@ class CFStacker(BaseEstimator):
                                                         W=W_init,
                                                         H=H_init)
             self.H = self.nmf_train.components_
-        if self.method == 'lr':
-            self.output_model.fit(self.W_train @ self.H, y)
+            if self.method == 'lr':
+                self.output_model.fit(self.W_train @ self.H, y)
         return self
 
     def predict(self, X):
@@ -150,8 +150,6 @@ class CFStacker(BaseEstimator):
                 X_predict = np.nanmean(self.X_predict_masked, axis=1)
             elif self.method == 'median':
                 X_predict = np.nanmedian(self.X_predict_masked, axis=1)
-            elif self.method == 'lr':
-                X_predict = self.output_model.predict_proba(self.W_predict @ self.H)[:, 1]
         if self.return_probs:
             return X_predict
         else:

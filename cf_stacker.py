@@ -86,8 +86,6 @@ class CFStacker(BaseEstimator):
 
     def fit(self, X, y):
 
-        X_orig = np.copy(X)
-
         unreliable_probs = np.abs(X - np.expand_dims(y, axis=1))
         unreliable_probs[unreliable_probs >= 0.5] = 1
         unreliable_probs[unreliable_probs < 0.5] = 0
@@ -116,13 +114,10 @@ class CFStacker(BaseEstimator):
                                                         H=H_init)
             self.H = self.nmf_train.components_
         if self.method == 'lr':
-            self.output_model.fit(X_orig, y)
-            # self.output_model.fit(self.W_train @ self.H, y)
+            self.output_model.fit(self.W_train @ self.H, y)
         return self
 
     def predict(self, X):
-
-        X_orig = np.copy(X)
 
         self.mask_predict = self.basemodel.predict(X)
 
@@ -149,8 +144,7 @@ class CFStacker(BaseEstimator):
             elif self.method == 'median':
                 X_predict = np.median(self.W_predict @ self.H, axis=1)
             elif self.method == 'lr':
-                X_predict = self.output_model.predict_proba(X_orig)[:, 1]
-                # X_predict = self.output_model.predict_proba(self.W_predict @ self.H)[:, 1]
+                X_predict = self.output_model.predict_proba(self.W_predict @ self.H)[:, 1]
         else:
             if self.method == 'mean':
                 X_predict = np.nanmean(self.X_predict_masked, axis=1)

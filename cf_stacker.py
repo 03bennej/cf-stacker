@@ -74,15 +74,15 @@ class CFStacker(BaseEstimator):
         if self.method == 'lr':
             self.output_model = LogisticRegression()
 
-        self.W_predict = None
-        self.nmf_predict = None
-        self.X_predict_masked = None
-        self.mask_predict = None
         self.H = None
         self.W_train = None
         self.nmf_train = None
         self.X_train_masked = None
         self.mask_train = None
+        self.W_predict = None
+        self.nmf_predict = None
+        self.X_predict_masked = None
+        self.mask_predict = None
 
     def fit(self, X, y):
 

@@ -122,7 +122,7 @@ class CFStacker(BaseEstimator):
 
     def predict(self, X):
 
-        self.X_comb = np.concatenate(self.X_comb, X, axis=1)
+        self.X_comb = np.concatenate((self.X_comb, X), axis=1)
 
         self.mask_predict = self.basemodel.predict(X)
 

@@ -16,6 +16,7 @@ from sklearn.svm import SVC, SVR
 from sklearn.neural_network import MLPClassifier, MLPRegressor
 from xgboost import XGBClassifier
 
+
 def print_metrics(y_true, y_pred):
     print('f1_score: ', sklearn.metrics.f1_score(y_true, y_pred))
     print('accuracy: ', sklearn.metrics.accuracy_score(y_true, y_pred))
@@ -87,11 +88,11 @@ class CFStacker(BaseEstimator):
 
     def fit(self, X, y):
 
-        #self.X_comb = X
+        # self.X_comb = X
 
         unreliable_probs = np.abs(X - np.expand_dims(y, axis=1))
-        unreliable_probs[unreliable_probs >= 0.5] = 1 # incorrect predictions
-        unreliable_probs[unreliable_probs < 0.5] = 0 # correct predictions
+        unreliable_probs[unreliable_probs >= 0.5] = 1  # incorrect predictions
+        unreliable_probs[unreliable_probs < 0.5] = 0  # correct predictions
 
         self.basemodel.fit(X, unreliable_probs)
 
@@ -122,7 +123,7 @@ class CFStacker(BaseEstimator):
 
     def predict(self, X):
 
-        #self.X_comb = np.concatenate((self.X_comb, X), axis=0)
+        # self.X_comb = np.concatenate((self.X_comb, X), axis=0)
 
         self.mask_predict = self.basemodel.predict(X)
 

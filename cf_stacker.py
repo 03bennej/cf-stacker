@@ -89,7 +89,7 @@ class CFStacker(BaseEstimator):
 
         #self.X_comb = X
 
-        unreliable_probs = np.abs(X - np.expand_dims(y, axis=1)) ** 2
+        unreliable_probs = np.abs(X - np.expand_dims(y, axis=1)) ** 1
         unreliable_probs[unreliable_probs >= 0.5] = 1
         unreliable_probs[unreliable_probs < 0.5] = 0
 

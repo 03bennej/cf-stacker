@@ -96,7 +96,7 @@ class CFStacker(BaseEstimator):
 
         self.basemodel.fit(X, unreliable_probs)
 
-        self.mask_train = self.basemodel.predict(X)
+        self.mask_train = list_to_matrix(self.basemodel.predict_proba(X))
 
         self.X_train_masked = remove_unreliable_entries(X,
                                                         unreliable_entries=self.mask_train,
@@ -164,8 +164,8 @@ class CFStacker(BaseEstimator):
             return X_predict
 
     def _generate_basemodel(self):
-        # return MultiOutputClassifier(estimator=self.base_estimator)
-        return MultiOutputRegressor(estimator=self.base_estimator)
+        return MultiOutputClassifier(estimator=self.base_estimator)
+        #return MultiOutputRegressor(estimator=self.base_estimator)
 
 
 if __name__ == "__main__":

@@ -30,8 +30,7 @@ def remove_unreliable_entries(data,
                               threshold=0.5,
                               target=np.nan):
     data_new = np.copy(data)
-    #data_new[unreliable_entries > threshold] = target
-    data_new[unreliable_entries < threshold] = target
+    data_new[unreliable_entries > threshold] = target
     return data_new
 
 
@@ -91,7 +90,7 @@ class CFStacker(BaseEstimator):
 
         # self.X_comb = X
 
-        unreliable_probs = X - np.expand_dims(y, axis=1)
+        unreliable_probs = np.abs(X - np.expand_dims(y, axis=1))
         #unreliable_probs[unreliable_probs >= 0.5] = 1  # incorrect predictions
         #unreliable_probs[unreliable_probs < 0.5] = 0  # correct predictions
 

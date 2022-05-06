@@ -40,7 +40,7 @@ def list_to_matrix(probs_list):
         n_points = probs_list[0].shape[0]
         matrix = np.ones((n_points, list_len))
         for i in range(list_len):
-            matrix[:, i] = probs_list[i][:, 1]
+            matrix[:, i] = probs_list[i][:, 0]
     else:
         matrix = probs_list
     return matrix

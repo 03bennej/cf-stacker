@@ -40,7 +40,7 @@ def list_to_matrix(probs_list):
         n_points = probs_list[0].shape[0]
         matrix = np.ones((n_points, list_len))
         for i in range(list_len):
-            matrix[:, i] = probs_list[i][:, 0]
+            matrix[:, i] = probs_list[i][:, 1]
     else:
         matrix = probs_list
     return matrix
@@ -51,7 +51,7 @@ class CFStacker(BaseEstimator):
     def __init__(self,
                  base_estimator,
                  latent_dimension,
-                 threshold=0.9,
+                 threshold=0.5,
                  alpha_nmf=0.0,
                  max_iter_nmf=500,
                  tol_nmf=1e-4,

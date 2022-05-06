@@ -51,7 +51,7 @@ class CFStacker(BaseEstimator):
     def __init__(self,
                  base_estimator,
                  latent_dimension,
-                 threshold=0.5,
+                 threshold=0.9,
                  alpha_nmf=0.0,
                  max_iter_nmf=500,
                  tol_nmf=1e-4,

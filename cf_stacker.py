@@ -138,7 +138,7 @@ class CFStacker(BaseEstimator):
 
         if self.nmf:
 
-            self.X_comb_masked = np.concatenate((self.X_comb_masked, self.X_predict_masked), axis=0)
+            # self.X_comb_masked = np.concatenate((self.X_comb_masked, self.X_predict_masked), axis=0)
 
             self.nmf_predict = NMF(n_components=self.latent_dimension,
                                    max_iter=self.max_iter_nmf,
@@ -150,9 +150,10 @@ class CFStacker(BaseEstimator):
                                    update_H=True)
 
             # W_init = np.random.rand(self.X_comb_masked.shape[0], self.latent_dimension)
-            W_init = np.concatenate((self.W_train,
-                                    np.random.rand(X.shape[0], self.latent_dimension)),
-                                    axis=1)
+            W_init = self.W_train
+            # W_init = np.concatenate((self.W_train,
+            #                         np.random.rand(X.shape[0], self.latent_dimension)),
+            #                         axis=0)
             print(np.shape(W_init))
             #print(np.shape(self.W_train))
             self.W = self.nmf_predict.fit_transform(self.X_comb_masked,

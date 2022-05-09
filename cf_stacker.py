@@ -94,7 +94,7 @@ class CFStacker(BaseEstimator):
 
         self.basemodel.fit(X, unreliable_probs)
 
-        #self.mask_train = np.round(unreliable_probs) # self.basemodel.predict(X)
+        # self.mask_train = np.round(unreliable_probs) # self.basemodel.predict(X)
 
         self.X_train_masked = remove_unreliable_entries(X,
                                                         unreliable_entries=unreliable_probs,
@@ -200,7 +200,7 @@ if __name__ == "__main__":
                                    learning_rate='adaptive',
                                    max_iter=200)
 
-    model1 = cf_stacker(base_estimator=base_estimator1,
+    model1 = CFStacker(base_estimator=base_estimator1,
                         latent_dimension=4,
                         threshold=0.5,
                         alpha_nmf=0.05,

@@ -159,7 +159,7 @@ class CFStacker(BaseEstimator):
 
             self.X_comb_reestimated = self.W @ self.H
 
-            X_predict = self.X_comb_reestimated[self.X_train_shape[0]:, :]
+            X_predict = self.X_comb_reestimated[:, self.X_train_shape[1]::]
 
             if self.method == 'mean':
                 X_predict = np.mean(self.X_comb_reestimated, axis=1)

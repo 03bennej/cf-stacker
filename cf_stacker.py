@@ -91,8 +91,6 @@ class CFStacker(BaseEstimator):
         self.X_comb = X
 
         unreliable_probs = np.abs(X - np.expand_dims(y, axis=1))
-        unreliable_probs[unreliable_probs >= 0.5] = 1  # incorrect predictions
-        unreliable_probs[unreliable_probs < 0.5] = 0  # correct predictions
 
         self.basemodel.fit(X, unreliable_probs)
 
@@ -166,8 +164,8 @@ class CFStacker(BaseEstimator):
             return X_predict
 
     def _generate_basemodel(self):
-        return MultiOutputClassifier(estimator=self.base_estimator)
-        #return MultiOutputRegressor(estimator=self.base_estimator)
+        #return MultiOutputClassifier(estimator=self.base_estimator)
+        return MultiOutputRegressor(estimator=self.base_estimator)
 
 
 if __name__ == "__main__":

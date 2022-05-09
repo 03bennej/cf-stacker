@@ -162,11 +162,11 @@ class CFStacker(BaseEstimator):
             X_predict = self.X_comb_reestimated[:, self.X_train_shape[1]::]
 
             if self.method == 'mean':
-                X_predict = np.mean(self.X_predict, axis=1)
+                X_predict = np.mean(X_predict, axis=1)
             elif self.method == 'median':
-                X_predict = np.median(self.X_predict, axis=1)
+                X_predict = np.median(X_predict, axis=1)
             elif self.method == 'lr':
-                X_predict = self.output_model.predict_proba(self.X_predict)[:, 1]
+                X_predict = self.output_model.predict_proba(X_predict)[:, 1]
         else:
             if self.method == 'mean':
                 X_predict = np.nanmean(self.X_predict_masked, axis=1)

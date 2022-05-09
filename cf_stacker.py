@@ -159,7 +159,7 @@ class CFStacker(BaseEstimator):
 
             self.X_comb_reestimated = self.W @ self.H
 
-            X_predict = self.X_comb_reestimated[:, self.X_train_shape[1]::]
+            X_predict = self.X_predict_masked #self.X_comb_reestimated[:, self.X_train_shape[1]::]
 
             if self.method == 'mean':
                 X_predict = np.mean(self.X_comb_reestimated, axis=1)
@@ -177,7 +177,6 @@ class CFStacker(BaseEstimator):
         else:
             X_predict[X_predict > 0.5] = 1
             X_predict[X_predict <= 0.5] = 0
-            print(np.shape(X_predict))
             return X_predict
 
     def _generate_basemodel(self):

@@ -177,7 +177,8 @@ class CFStacker(BaseEstimator):
         else:
             X_predict[X_predict > 0.5] = 1
             X_predict[X_predict <= 0.5] = 0
-            return print(np.shape(X_predict))
+            print(np.shape(X_predict))
+            return X_predict
 
     def _generate_basemodel(self):
         #return MultiOutputClassifier(estimator=self.base_estimator)

@@ -94,7 +94,7 @@ class CFStacker(BaseEstimator):
 
         self.basemodel.fit(X, unreliable_probs)
 
-        self.mask_train = unreliable_probs #self.basemodel.predict(X)
+        self.mask_train = self.basemodel.predict(X)
 
         self.X_train_masked = remove_unreliable_entries(X,
                                                         unreliable_entries=self.mask_train,

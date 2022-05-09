@@ -102,9 +102,7 @@ class CFStacker(BaseEstimator):
 
         if self.nmf:
 
-            #self.X_comb_masked = np.copy(self.X_train_masked)
-
-            self.X_train_shape = np.shape(self.X_comb_masked)
+            self.X_train_shape = np.shape(self.X)
 
             self.nmf_train = NMF(n_components=self.latent_dimension,
                                  max_iter=self.max_iter_nmf,

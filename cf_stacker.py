@@ -148,8 +148,8 @@ class CFStacker(BaseEstimator):
                                    l1_ratio=self.l1_ratio,
                                    alpha=self.alpha_nmf,
                                    update_H=True)
-            W_init = np.concatenate(self.W_train,
-                                    np.random.rand(X.shape[0], self.latent_dimension),
+            W_init = np.concatenate((self.W_train,
+                                    np.random.rand(X.shape[0], self.latent_dimension)),
                                     axis=0)
             self.W = self.nmf_predict.fit_transform(self.X_comb_masked,
                                                             W=W_init,

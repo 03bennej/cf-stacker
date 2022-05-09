@@ -75,53 +75,60 @@ class CFStacker(BaseEstimator):
         if self.method == 'lr':
             self.output_model = LogisticRegression()
 
-        self.X_comb = None
+        self.X_comb_masked = None
+        self.X_train_shape = None
+        self.X_comb_reestimated = None
         self.H = None
         self.W_train = None
         self.nmf_train = None
         self.X_train_masked = None
         self.mask_train = None
-        self.W_predict = None
+        self.W = None
         self.nmf_predict = None
         self.X_predict_masked = None
         self.mask_predict = None
 
     def fit(self, X, y):
 
-        self.X_comb = X
-
         unreliable_probs = np.abs(X - np.expand_dims(y, axis=1))
 
         self.basemodel.fit(X, unreliable_probs)
 
-        self.mask_train = self.basemodel.predict(X)
+        #self.mask_train = np.round(unreliable_probs) # self.basemodel.predict(X)
 
         self.X_train_masked = remove_unreliable_entries(X,
-                                                        unreliable_entries=self.mask_train,
+                                                        unreliable_entries=unreliable_probs,
                                                         threshold=self.threshold)
 
-        # if self.nmf:
-        #     self.nmf_train = NMF(n_components=self.latent_dimension,
-        #                          max_iter=self.max_iter_nmf,
-        #                          init='custom',
-        #                          solver='mu',
-        #                          tol=self.tol_nmf,
-        #                          l1_ratio=self.l1_ratio,
-        #                          alpha=self.alpha_nmf,
-        #                          update_H=True)
-        #     W_init = np.random.rand(X.shape[0], self.latent_dimension)
-        #     H_init = np.random.rand(self.latent_dimension, X.shape[1])
-        #     self.W_train = self.nmf_train.fit_transform(self.X_train_masked,
-        #                                                 W=W_init,
-        #                                                 H=H_init)
-        #     self.H = self.nmf_train.components_
-        #     if self.method == 'lr':
-        #         self.output_model.fit(self.W_train @ self.H, y)
+        if self.nmf:
+
+            self.X_comb_masked = np.copy(self.X_train_masked)
+
+            self.X_train_shape = np.shape(self.X_comb_masked)
+
+            self.nmf_train = NMF(n_components=self.latent_dimension,
+                                 max_iter=self.max_iter_nmf,
+                                 init='custom',
+                                 solver='mu',
+                                 tol=self.tol_nmf,
+                                 l1_ratio=self.l1_ratio,
+                                 alpha=self.alpha_nmf,
+                                 update_H=True)
+
+            W_init = np.random.rand(X.shape[0], self.latent_dimension)
+            H_init = np.random.rand(self.latent_dimension, X.shape[1])
+
+            self.W_train = self.nmf_train.fit_transform(self.X_train_masked,
+                                                        W=W_init,
+                                                        H=H_init)
+            self.H = self.nmf_train.components_
+
+            if self.method == 'lr':
+                self.output_model.fit(self.W_train @ self.H, y)
+
         return self
 
     def predict(self, X):
-
-        # self.X_comb = np.concatenate((self.X_comb, X), axis=0)
 
         self.mask_predict = self.basemodel.predict(X)
 
@@ -130,6 +137,11 @@ class CFStacker(BaseEstimator):
                                                           threshold=self.threshold)
 
         if self.nmf:
+
+            self.X_train_shape = np.shape(self.X_comb)
+
+            self.X_comb_predict_masked = np.concatenate((self.X_comb, self.X_predict_masked), axis=0)
+
             self.nmf_predict = NMF(n_components=self.latent_dimension,
                                    max_iter=self.max_iter_nmf,
                                    init='custom',
@@ -137,18 +149,24 @@ class CFStacker(BaseEstimator):
                                    tol=self.tol_nmf,
                                    l1_ratio=self.l1_ratio,
                                    alpha=self.alpha_nmf,
-                                   update_H=False)
-            W_init = np.random.rand(X.shape[0], self.latent_dimension)
-            self.W_predict = self.nmf_predict.fit_transform(self.X_predict_masked,
+                                   update_H=True)
+            W_init = np.concatenate(self.W_train,
+                                    np.random.rand(X.shape[0], self.latent_dimension),
+                                    axis=0)
+            self.W = self.nmf_predict.fit_transform(self.X_predict_masked,
                                                             W=W_init,
                                                             H=self.H)
 
+            self.X_comb_reestimated = self.W @ self.H
+
+            X_predict = self.X_comb_reestimated[self.X_train_shape[0]:, :]
+
             if self.method == 'mean':
-                X_predict = np.mean(self.W_predict @ self.H, axis=1)
+                X_predict = np.mean(self.X_comb_reestimated, axis=1)
             elif self.method == 'median':
-                X_predict = np.median(self.W_predict @ self.H, axis=1)
+                X_predict = np.median(self.X_comb_reestimated, axis=1)
             elif self.method == 'lr':
-                X_predict = self.output_model.predict_proba(self.W_predict @ self.H)[:, 1]
+                X_predict = self.output_model.predict_proba(self.X_comb_reestimated)[:, 1]
         else:
             if self.method == 'mean':
                 X_predict = np.nanmean(self.X_predict_masked, axis=1)

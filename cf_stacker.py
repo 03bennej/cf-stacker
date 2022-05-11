@@ -35,7 +35,7 @@ def thresholds(X, y, beta=1):
         fmeasure = (1 + beta**2) * precision * recall / (beta**2 * precision + recall)
         argmax = np.argmax(fmeasure)
         thresholds.append(threshold[argmax])
-    print(thresholds)
+    # print(thresholds)
     return thresholds
 
 
@@ -46,8 +46,8 @@ def remove_unreliable_entries(data,
     data_new = np.copy(data)
     total_entries = len(np.ndarray.flatten(data_new))
     data_new[unreliable_entries > threshold] = target
-    removed_entries = len(np.ndarray.flatten(data_new[data_new == target]))
-    # print(f"Removed {removed_entries}/{total_entries} entries")
+    removed_entries = len(np.ndarray.flatten(data_new[data_new is target]))
+    print(f"Removed {removed_entries}/{total_entries} entries")
     return data_new
 
 

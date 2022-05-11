@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from nmf import NMF
+from sklearn.metrics import precision_recall_curve
 import sklearn
 from sklearn.base import BaseEstimator
 from sklearn.metrics import confusion_matrix
@@ -23,6 +24,17 @@ def print_metrics(y_true, y_pred):
     print('precision: ', sklearn.metrics.precision_score(y_true, y_pred))
     print('recall: ', sklearn.metrics.recall_score(y_true, y_pred))
     print('AUC: ', sklearn.metrics.roc_auc_score(y_true, y_pred))
+
+
+def thresholds(X, y, beta=1):
+    # beta = 0 for precision, beta -> infinity for recall, beta=1 for harmonic mean
+    thresholds = []
+    for i in range(np.shape(X)[1]):
+        precision, recall, threshold = precision_recall_curve(X[:, i], y)
+        fmeasure = (1 + beta**2) * precision * recall / (beta**2 * precision + recall)
+        argmax = np.argmax(fmeasure)
+        thresholds = thresholds.append(threshold(argmax))
+    return thresholds
 
 
 def remove_unreliable_entries(data,
@@ -89,6 +101,9 @@ class CFStacker(BaseEstimator):
         self.mask_predict = None
 
     def fit(self, X, y):
+
+        if self.threshold == 'variable':
+            self.threshold = thresholds(X, y)
 
         unreliable_probs = np.abs(X - np.expand_dims(y, axis=1))
 

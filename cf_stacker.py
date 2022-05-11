@@ -92,7 +92,7 @@ class CFStacker(BaseEstimator):
 
         unreliable_probs = np.abs(X - np.expand_dims(y, axis=1))
 
-        self.basemodel.fit(X, y)
+        self.basemodel.fit(X, unreliable_probs)
 
         self.mask_train = self.basemodel.predict(X)
 

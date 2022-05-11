@@ -30,7 +30,7 @@ def thresholds(X, y, beta=1):
     # beta = 0 for precision, beta -> infinity for recall, beta=1 for harmonic mean
     thresholds = []
     for i in range(np.shape(X)[1]):
-        precision, recall, threshold = precision_recall_curve(X[:, i], y)
+        precision, recall, threshold = precision_recall_curve(X.iloc[:, i], y)
         fmeasure = (1 + beta**2) * precision * recall / (beta**2 * precision + recall)
         argmax = np.argmax(fmeasure)
         thresholds = thresholds.append(threshold(argmax))

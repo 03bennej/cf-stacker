@@ -43,9 +43,9 @@ def remove_unreliable_entries(data,
                               threshold=0.5,
                               target=np.nan):
     data_new = np.copy(data)
-    total_entries = len(np.flatten(data_new))
+    total_entries = len(np.ndarray.flatten(data_new))
     data_new[unreliable_entries > threshold] = target
-    removed_entries = len(np.flatten(data_new[data_new == target]))
+    removed_entries = len(np.ndarray.flatten(data_new[data_new == target]))
     print(f"Removed {removed_entries}/{total_entries} entries")
     return data_new
 

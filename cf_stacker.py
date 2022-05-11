@@ -28,9 +28,10 @@ def print_metrics(y_true, y_pred):
 
 def thresholds(X, y, beta=1):
     # beta = 0 for precision, beta -> infinity for recall, beta=1 for harmonic mean
+    X_temp = np.copy(X).to_numpy()
     thresholds = []
-    for i in range(np.shape(X)[1]):
-        precision, recall, threshold = precision_recall_curve(X.iloc[:, i], y)
+    for i in range(np.shape(X_temp)[1]):
+        precision, recall, threshold = precision_recall_curve(X_temp[:, i], y)
         fmeasure = (1 + beta**2) * precision * recall / (beta**2 * precision + recall)
         argmax = np.argmax(fmeasure)
         thresholds = thresholds.append(threshold(argmax))

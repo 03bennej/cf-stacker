@@ -43,7 +43,7 @@ def remove_unreliable_entries(data,
                               threshold=0.5,
                               target=np.nan):
     data_new = np.copy(data)
-    data_new[unreliable_entries > threshold] = target
+    data_new[unreliable_entries < threshold] = target
     return data_new
 
 

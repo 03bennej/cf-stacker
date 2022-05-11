@@ -34,7 +34,7 @@ def thresholds(X, y, beta=1):
         precision, recall, threshold = precision_recall_curve(y, X_temp[:, i])
         fmeasure = (1 + beta**2) * precision * recall / (beta**2 * precision + recall)
         argmax = np.argmax(fmeasure)
-        thresholds = thresholds.append(threshold[argmax])
+        thresholds.append(threshold[argmax])
     return thresholds
 
 

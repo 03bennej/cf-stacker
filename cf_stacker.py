@@ -26,7 +26,7 @@ def print_metrics(y_true, y_pred):
     print('AUC: ', sklearn.metrics.roc_auc_score(y_true, y_pred))
 
 
-def thresholds(X, y, beta=0):
+def thresholds(X, y, beta=0.01):
     # beta = 0 for precision, beta -> infinity for recall, beta=1 for harmonic mean
     X_temp = np.copy(X)
     thresholds = []

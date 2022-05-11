@@ -35,7 +35,7 @@ def thresholds(X, y, beta=1):
         fmeasure = (1 + beta**2) * precision * recall / (beta**2 * precision + recall)
         argmax = np.argmax(fmeasure)
         thresholds.append(threshold[argmax])
-    print(threshold[argmax])
+    print(thresholds)
     return thresholds
 
 

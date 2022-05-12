@@ -198,12 +198,8 @@ class CFStacker(BaseEstimator):
         if self.return_probs:
             return X_predict
         else:
-            if self.threshold == 'variable':
-                X_predict[X_predict > self.thresholds] = 1
-                X_predict[X_predict <= self.thresholds] = 0
-            else:
-                X_predict[X_predict > 0.5] = 1
-                X_predict[X_predict <= 0.5] = 0
+            X_predict[X_predict > 0.5] = 1
+            X_predict[X_predict <= 0.5] = 0
             return X_predict
 
     def _generate_basemodel(self):

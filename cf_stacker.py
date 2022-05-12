@@ -32,7 +32,7 @@ def thresholds(X, y, beta=1):
     thresholds = []
     for i in range(np.shape(X_temp)[1]):
         precision, recall, threshold = precision_recall_curve(y, X_temp[:, i])
-        fmeasure = (1 + beta**2) * precision * recall / (beta**2 * precision + recall)
+        fmeasure = (1 + beta**2) * (precision * recall) / ((beta**2 * precision) + recall)
         argmax = np.argmax(fmeasure)
         thresholds.append(threshold[argmax])
     # print(thresholds)

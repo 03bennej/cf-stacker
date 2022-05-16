@@ -32,7 +32,7 @@ def thresholds(X, y, beta=1):
     thresholds = []
     for i in range(np.shape(X_temp)[1]):
         precision, recall, threshold = precision_recall_curve(y, X_temp[:, i])
-        fmeasure = (1 + beta**2) * (precision * recall) / ((beta**2 * precision) + recall)
+        fmeasure = (1 + beta ** 2) * (precision * recall) / ((beta ** 2 * precision) + recall)
         argmax = np.argmax(fmeasure)
         # if threshold[argmax] < 0.5:
         #     thres = 1-threshold[argmax]
@@ -119,14 +119,13 @@ class CFStacker(BaseEstimator):
 
         self.basemodel.fit(X, unreliable_probs)
 
-        self.mask_train = unreliable_probs #self.basemodel.predict(X)
+        self.mask_train = unreliable_probs  # self.basemodel.predict(X)
 
         self.X_train_masked = remove_unreliable_entries(X,
                                                         unreliable_entries=self.mask_train,
                                                         threshold=self.threshold)
 
         if self.nmf:
-
             self.X_train_shape = np.shape(X)
 
             self.nmf_train = NMF(n_components=self.latent_dimension,
@@ -176,12 +175,12 @@ class CFStacker(BaseEstimator):
                                    update_H=True)
 
             W_init = np.concatenate((self.W_train,
-                                    np.random.rand(X.shape[0], self.latent_dimension)),
+                                     np.random.rand(X.shape[0], self.latent_dimension)),
                                     axis=0)
 
             self.W = self.nmf_predict.fit_transform(self.X_comb_masked,
-                                                            W=W_init,
-                                                            H=self.H)
+                                                    W=W_init,
+                                                    H=self.H)
             self.H = self.nmf_predict.components_
             self.X_comb_reestimated = self.W @ self.H
 
@@ -233,12 +232,12 @@ if __name__ == "__main__":
                                    max_iter=200)
 
     model1 = CFStacker(base_estimator=base_estimator1,
-                        latent_dimension=4,
-                        threshold=0.5,
-                        alpha_nmf=0.05,
-                        max_iter_nmf=500,
-                        use_probs=False,
-                        nmf=True)
+                       latent_dimension=4,
+                       threshold=0.5,
+                       alpha_nmf=0.05,
+                       max_iter_nmf=500,
+                       use_probs=False,
+                       nmf=True)
     model1.fit(X_train, y_train)
 
     predict_train_svm = model1.predict(X_train, return_prob=False, method='mean')

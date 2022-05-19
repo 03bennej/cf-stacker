@@ -38,7 +38,7 @@ def thresholds(X, y, beta=1):
         #     thres = 1-threshold[argmax]
         # else:
         #     thres = threshold[argmax]
-        #th = threshold[argmax] if argmax < len(threshold) else 1.0
+        th = threshold[argmax]# if argmax < len(threshold) else 1.0
         thresholds.append(th)
         # thresholds.append(thres)
     return thresholds

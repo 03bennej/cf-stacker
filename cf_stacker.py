@@ -44,18 +44,6 @@ def thresholds(X, y, beta=1):
     return thresholds
 
 
-def remove_unreliable_entries(data,
-                              unreliable_entries,
-                              threshold=0.5,
-                              target=np.nan):
-    data_new = np.copy(data)
-    data_new[unreliable_entries > threshold] = target
-    # total_entries = len(np.ndarray.flatten(data_new))
-    # removed_entries = len(np.ndarray.flatten(data_new[np.isnan(data_new)]))
-    # print(f"Removed {removed_entries}/{total_entries} entries")
-    return data_new
-
-
 def generate_mask(unreliable_probs,
                   threshold=0.5):
     mask = np.copy(unreliable_probs)

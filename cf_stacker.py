@@ -51,12 +51,9 @@ def generate_mask(unreliable_probs,
     return mask
 
 
-def apply_mask(data, mask, invert_mask=False, target=np.nan):
+def apply_mask(data, mask, target=np.nan):
     data_new = np.copy(data)
-    if invert_mask:
-        data_new[np.invert(mask)] = target[np.invert(mask)]
-    else:
-        data_new[mask] = target
+    data_new[mask] = target
     return data_new
 
 
@@ -131,7 +128,6 @@ class CFStacker(BaseEstimator):
 
         self.X_train_masked = apply_mask(data=X,
                                          mask=self.mask_train,
-                                         invert_mask=False,
                                          target=np.nan)
 
         if self.nmf:
@@ -171,7 +167,6 @@ class CFStacker(BaseEstimator):
 
         self.X_predict_masked = apply_mask(data=X,
                                            mask=self.mask_predict,
-                                           invert_mask=False,
                                            target=np.nan)
 
         if self.nmf:
@@ -199,7 +194,7 @@ class CFStacker(BaseEstimator):
 
             X_predict = self.X_comb_reestimated[self.X_train_shape[0]::, :]
 
-            X_predict = apply_mask(data=X_predict,
+            X_predict = restore_reliable_probs(data=X_predict,
                                    mask=self.mask_predict,
                                    invert_mask=True,
                                    target=X)

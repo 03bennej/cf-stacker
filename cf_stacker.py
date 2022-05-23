@@ -161,7 +161,7 @@ class CFStacker(BaseEstimator):
                 X_temp = restore_reliable_probs(data_new=self.W_train @ self.H,
                                                 data_old=X,
                                                 mask=self.mask_train)
-                self.output_model.fit(X_temp, y)
+                self.output_model.fit(X, y)
             else:
                 self.output_model.fit(X, y)
 

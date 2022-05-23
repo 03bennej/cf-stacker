@@ -131,7 +131,7 @@ class CFStacker(BaseEstimator):
 
         self.X_train_masked = apply_mask(data=X,
                                          mask=self.mask_train,
-                                         boolean=True,
+                                         invert_mask=False,
                                          target=np.nan)
 
         if self.nmf:
@@ -171,7 +171,7 @@ class CFStacker(BaseEstimator):
 
         self.X_predict_masked = apply_mask(data=X,
                                            mask=self.mask_predict,
-                                           boolean=True,
+                                           invert_mask=True,
                                            target=np.nan)
 
         if self.nmf:
@@ -201,7 +201,7 @@ class CFStacker(BaseEstimator):
 
             X_predict = apply_mask(data=X_predict,
                                    mask=self.mask_predict,
-                                   boolean=False,
+                                   invert_mask=True,
                                    target=X)
 
             if self.method == 'mean':

@@ -159,7 +159,7 @@ class CFStacker(BaseEstimator):
 
         if self.method == 'lr':
             if self.nmf:
-                X_temp = self.W_train @ self.H
+                X_temp = X #self.W_train @ self.H
                 # X_temp = restore_reliable_probs(data_new=self.W_train @ self.H,
                 #                                 data_old=X,
                 #                                 mask=self.mask_train)

@@ -57,6 +57,19 @@ def apply_mask(data, mask, target=np.nan):
     return data_new
 
 
+def restore_reliable_probs(data_new,
+                           data_old,
+                           mask):
+    X_combined = np.copy(data_new)
+    imax, jmax = data_new.shape
+    for i in range(imax):
+        for j in range(jmax):
+            if np.invert(mask[i, j]):
+                X_combined[i, j] = data_old[i, j]
+    return X_combined
+
+
+
 def list_to_matrix(probs_list):
     if type(probs_list) is list:
         list_len = len(probs_list)
@@ -194,10 +207,9 @@ class CFStacker(BaseEstimator):
 
             X_predict = self.X_comb_reestimated[self.X_train_shape[0]::, :]
 
-            X_predict = restore_reliable_probs(data=X_predict,
-                                   mask=self.mask_predict,
-                                   invert_mask=True,
-                                   target=X)
+            X_predict = restore_reliable_probs(data_new=X_predict,
+                                               data_old=X,
+                                               mask=self.mask_predict)
 
             if self.method == 'mean':
                 X_predict = np.mean(X_predict, axis=1)

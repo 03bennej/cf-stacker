@@ -53,7 +53,7 @@ def generate_mask(unreliable_probs,
 
 def apply_mask(data, mask, boolean=True, target=np.nan):
     data_new = np.copy(data)
-    data_new[mask is boolean] = target
+    data_new[mask] = target
     return data_new
 
 

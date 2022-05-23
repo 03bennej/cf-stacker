@@ -199,7 +199,7 @@ class CFStacker(BaseEstimator):
 
             X_predict = apply_mask(data=X_predict,
                                    mask=self.mask_predict,
-                                   boolean=False,
+                                   boolean=True,
                                    target=X)
 
             if self.method == 'mean':

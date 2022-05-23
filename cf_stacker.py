@@ -49,6 +49,7 @@ def generate_mask(unreliable_probs,
     mask = np.copy(unreliable_probs)
     mask[unreliable_probs >= threshold] = True
     mask[unreliable_probs < threshold] = False
+    print(mask)
     return mask
 
 

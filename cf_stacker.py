@@ -171,7 +171,7 @@ class CFStacker(BaseEstimator):
 
         self.X_predict_masked = apply_mask(data=X,
                                            mask=self.mask_predict,
-                                           invert_mask=True,
+                                           invert_mask=False,
                                            target=np.nan)
 
         if self.nmf:
@@ -199,10 +199,10 @@ class CFStacker(BaseEstimator):
 
             X_predict = self.X_comb_reestimated[self.X_train_shape[0]::, :]
 
-            # X_predict = apply_mask(data=X_predict,
-            #                        mask=self.mask_predict,
-            #                        invert_mask=True,
-            #                        target=X)
+            X_predict = apply_mask(data=X_predict,
+                                   mask=self.mask_predict,
+                                   invert_mask=True,
+                                   target=X)
 
             if self.method == 'mean':
                 X_predict = np.mean(X_predict, axis=1)

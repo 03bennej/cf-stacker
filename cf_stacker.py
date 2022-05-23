@@ -136,7 +136,7 @@ class CFStacker(BaseEstimator):
 
         self.basemodel.fit(X, self.unreliable_probs_train)  # fit model to learn unreliable probabilities
 
-        self.mask_train = generate_mask(self.unreliable_probs,
+        self.mask_train = generate_mask(self.unreliable_probs_train,
                                         threshold=self.threshold)
 
         self.X_train_masked = apply_mask(X, self.mask_train)

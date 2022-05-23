@@ -159,10 +159,10 @@ class CFStacker(BaseEstimator):
 
         if self.method == 'lr':
             if self.nmf:
-                X_temp = restore_reliable_probs(data_new=self.W_train @ self.H,
-                                                data_old=X,
-                                                mask=self.mask_train)
-                self.output_model.fit(X, y)
+                X_temp = self.W_train @ self.H#restore_reliable_probs(data_new=self.W_train @ self.H,
+                                               # data_old=X,
+                                                #mask=self.mask_train)
+                self.output_model.fit(X_temp, y)
             else:
                 self.output_model.fit(X, y)
 
@@ -204,9 +204,9 @@ class CFStacker(BaseEstimator):
 
             X_predict = self.X_comb_reestimated[self.X_train_shape[0]::, :]
 
-            X_predict = restore_reliable_probs(data_new=X_predict,
-                                               data_old=X,
-                                               mask=self.mask_predict)
+            # X_predict = restore_reliable_probs(data_new=X_predict,
+            #                                    data_old=X,
+            #                                    mask=self.mask_predict)
 
             if self.method == 'mean':
                 X_predict = np.mean(X_predict, axis=1)

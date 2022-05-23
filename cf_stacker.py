@@ -60,14 +60,8 @@ def apply_mask(data, mask, target=np.nan):
 def restore_reliable_probs(data_new,
                            data_old,
                            mask):
-    X_combined = np.copy(data_new)
-    imax, jmax = data_new.shape
-    for i in range(imax):
-        for j in range(jmax):
-            if np.invert(mask[i, j]):
-                X_combined[i, j] = data_old[i, j]
-    return X_combined
-
+    data_new[mask is False] = data_old[mask is False]
+    return data_new
 
 
 def list_to_matrix(probs_list):

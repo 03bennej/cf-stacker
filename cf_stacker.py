@@ -60,7 +60,10 @@ def apply_mask(data, mask, target=np.nan):
 def restore_reliable_probs(data_new,
                            data_old,
                            mask):
-    data_new[np.invert(mask)] = data_old.to_numpy()[np.invert(mask)]
+    if type(data_old).__module__ == np.__name__:
+        data_new[np.invert(mask)] = data_old[np.invert(mask)]
+    else:
+        data_new[np.invert(mask)] = data_old.to_numpy()[np.invert(mask)]
     return data_new
 
 

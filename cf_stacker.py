@@ -63,12 +63,6 @@ def restore_reliable_probs(data_new,
     data_new[np.invert(mask)] = data_old.to_numpy()[np.invert(mask)]
     return data_new
 
-def restore_reliable_probs2(data_new,
-                           data_old,
-                           mask):
-    data_new[np.invert(mask)] = data_old[np.invert(mask)]
-    return data_new
-
 def list_to_matrix(probs_list):
     if type(probs_list) is list:
         list_len = len(probs_list)

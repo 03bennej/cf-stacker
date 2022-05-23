@@ -56,6 +56,20 @@ def remove_unreliable_entries(data,
     return data_new
 
 
+def generate_mask(unreliable_probs,
+                  threshold=0.5):
+    mask = np.copy(unreliable_probs)
+    mask[unreliable_probs >= threshold] = True
+    mask[unreliable_probs < threshold] = False
+    return mask
+
+
+def apply_mask(data, mask, target=np.nan):
+    data_new = np.copy(data)
+    data_new[mask] = target
+    return data_new
+
+
 def list_to_matrix(probs_list):
     if type(probs_list) is list:
         list_len = len(probs_list)
@@ -105,25 +119,27 @@ class CFStacker(BaseEstimator):
         self.nmf_train = None
         self.X_train_masked = None
         self.mask_train = None
-        self.W = None
-        self.nmf_predict = None
+        self.unreliable_probs_train = None
+
         self.X_predict_masked = None
         self.mask_predict = None
+        self.unreliable_probs_predict = None
+        self.W = None
+        self.nmf_predict = None
 
     def fit(self, X, y):
 
         if self.threshold == 'variable':
-            self.threshold = thresholds(X, y)
+            self.threshold = thresholds(X, y)  # calculate variable thresholds using fmeasure
 
-        unreliable_probs = np.abs(X - np.expand_dims(y, axis=1))
+        self.unreliable_probs_train = np.abs(X - np.expand_dims(y, axis=1))  # define unreliable probabilities
 
-        self.basemodel.fit(X, unreliable_probs)
+        self.basemodel.fit(X, self.unreliable_probs_train)  # fit model to learn unreliable probabilities
 
-        self.mask_train = unreliable_probs  # self.basemodel.predict(X)
+        self.mask_train = generate_mask(self.unreliable_probs,
+                                        threshold=self.threshold)
 
-        self.X_train_masked = remove_unreliable_entries(X,
-                                                        unreliable_entries=self.mask_train,
-                                                        threshold=self.threshold)
+        self.X_train_masked = apply_mask(X, self.mask_train)
 
         if self.nmf:
             self.X_train_shape = np.shape(X)
@@ -155,11 +171,12 @@ class CFStacker(BaseEstimator):
 
     def predict(self, X):
 
-        self.mask_predict = self.basemodel.predict(X)
+        self.unreliable_probs_predict = self.basemodel.predict(X)
 
-        self.X_predict_masked = remove_unreliable_entries(X,
-                                                          unreliable_entries=self.mask_predict,
-                                                          threshold=self.threshold)
+        self.mask_predict = generate_mask(self.unreliable_probs_predict,
+                                          threshold=self.threshold)
+
+        self.X_predict_masked = apply_mask(X, self.mask_predict)
 
         if self.nmf:
 

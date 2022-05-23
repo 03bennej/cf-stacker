@@ -127,7 +127,10 @@ class CFStacker(BaseEstimator):
         self.mask_train = generate_mask(self.unreliable_probs_train,
                                         threshold=self.threshold)
 
-        self.X_train_masked = apply_mask(X, self.mask_train)
+        self.X_train_masked = apply_mask(data=X,
+                                         mask=self.mask_train,
+                                         boolean=True,
+                                         target=np.nan)
 
         if self.nmf:
             self.X_train_shape = np.shape(X)
@@ -164,7 +167,10 @@ class CFStacker(BaseEstimator):
         self.mask_predict = generate_mask(self.unreliable_probs_predict,
                                           threshold=self.threshold)
 
-        self.X_predict_masked = apply_mask(X, self.mask_predict)
+        self.X_predict_masked = apply_mask(data=X,
+                                           mask=self.mask_predict,
+                                           boolean=True,
+                                           target=np.nan)
 
         if self.nmf:
 
@@ -190,6 +196,11 @@ class CFStacker(BaseEstimator):
             self.X_comb_reestimated = self.W @ self.H
 
             X_predict = self.X_comb_reestimated[self.X_train_shape[0]::, :]
+
+            X_predict = apply_mask(data=X_predict,
+                                   mask=self.mask_predict,
+                                   boolean=False,
+                                   target=X)
 
             if self.method == 'mean':
                 X_predict = np.mean(X_predict, axis=1)

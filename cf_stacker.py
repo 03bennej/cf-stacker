@@ -51,9 +51,12 @@ def generate_mask(unreliable_probs,
     return mask
 
 
-def apply_mask(data, mask, boolean=True, target=np.nan):
+def apply_mask(data, mask, invert_mask=False, target=np.nan):
     data_new = np.copy(data)
-    data_new[mask] = target
+    if invert_mask:
+        data_new[np.invert(mask)] = target
+    else:
+        data_new[mask] = target
     return data_new
 
 

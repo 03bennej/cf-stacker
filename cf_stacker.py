@@ -132,7 +132,7 @@ class CFStacker(BaseEstimator):
 
         self.unreliable_probs_train = self.basemodel.predict(X)
 
-        self.mask_train = generate_mask(self.unreliable_probs_train,
+        self.mask_train = generate_mask(self.unreliable_probs_labels,
                                         threshold=self.threshold)
 
         self.X_train_masked = apply_mask(data=X,

@@ -208,9 +208,9 @@ class CFStacker(BaseEstimator):
 
             X_predict = self.X_comb_reestimated[self.X_train_shape[0]::, :]
 
-            # X_predict = restore_reliable_probs(data_new=X_predict,
-            #                                    data_old=X,
-            #                                    mask=self.mask_predict)
+            X_predict = restore_reliable_probs(data_new=X_predict,
+                                               data_old=X,
+                                               mask=self.mask_predict)
 
             if self.method == 'mean':
                 X_predict = np.mean(X_predict, axis=1)

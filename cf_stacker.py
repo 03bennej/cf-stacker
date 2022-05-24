@@ -208,6 +208,8 @@ class CFStacker(BaseEstimator):
 
             X_predict = self.X_comb_reestimated[self.X_train_shape[0]::, :]
 
+            print(X_predict)
+
             # X_predict = restore_reliable_probs(data_new=X_predict,
             #                                    data_old=X,
             #                                    mask=self.mask_predict)

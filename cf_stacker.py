@@ -148,6 +148,7 @@ class CFStacker(BaseEstimator):
                                  max_iter=self.max_iter_nmf,
                                  init='custom',
                                  solver='mu',
+                                 beta_loss='kullback-leibler',
                                  tol=self.tol_nmf,
                                  l1_ratio=self.l1_ratio,
                                  alpha=self.alpha_nmf,
@@ -191,10 +192,11 @@ class CFStacker(BaseEstimator):
                                    max_iter=self.max_iter_nmf,
                                    init='custom',
                                    solver='mu',
+                                   beta_loss='kullback-leibler',
                                    tol=self.tol_nmf,
                                    l1_ratio=self.l1_ratio,
                                    alpha=self.alpha_nmf,
-                                   update_H=False)
+                                   update_H=True)
 
             W_init = np.concatenate((self.W_train,
                                      np.random.rand(X.shape[0], self.latent_dimension)),

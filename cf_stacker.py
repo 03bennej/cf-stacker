@@ -147,7 +147,7 @@ class CFStacker(BaseEstimator):
             self.nmf_train = NMF(n_components=self.latent_dimension,
                                  max_iter=self.max_iter_nmf,
                                  init='custom',
-                                 solver='cd',
+                                 solver='mu',
                                  tol=self.tol_nmf,
                                  l1_ratio=self.l1_ratio,
                                  alpha=self.alpha_nmf,
@@ -190,7 +190,7 @@ class CFStacker(BaseEstimator):
             self.nmf_predict = NMF(n_components=self.latent_dimension,
                                    max_iter=self.max_iter_nmf,
                                    init='custom',
-                                   solver='cd',
+                                   solver='mu',
                                    tol=self.tol_nmf,
                                    l1_ratio=self.l1_ratio,
                                    alpha=self.alpha_nmf,
@@ -204,7 +204,7 @@ class CFStacker(BaseEstimator):
                                                     W=W_init,
                                                     H=self.H)
             self.H = self.nmf_predict.components_
-            self.X_comb_reestimated = self.W @ self.H
+            self.X_comb_reestimated = np.matmul(self.W, self.H)
 
             X_predict = self.X_comb_reestimated[self.X_train_shape[0]::, :]
 

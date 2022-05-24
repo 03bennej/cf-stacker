@@ -176,6 +176,8 @@ class CFStacker(BaseEstimator):
 
         self.unreliable_probs_predict = self.basemodel.predict(X)
 
+        print(self.unreliable_probs_predict)
+
         self.mask_predict = generate_mask(self.unreliable_probs_predict,
                                           threshold=self.threshold)
 
@@ -207,8 +209,6 @@ class CFStacker(BaseEstimator):
             self.X_comb_reestimated = self.W @ self.H
 
             X_predict = self.X_comb_reestimated[self.X_train_shape[0]::, :]
-
-            print(X_predict)
 
             # X_predict = restore_reliable_probs(data_new=X_predict,
             #                                    data_old=X,

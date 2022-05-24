@@ -194,7 +194,7 @@ class CFStacker(BaseEstimator):
                                    tol=self.tol_nmf,
                                    l1_ratio=self.l1_ratio,
                                    alpha=self.alpha_nmf,
-                                   update_H=True)
+                                   update_H=False)
 
             W_init = np.concatenate((self.W_train,
                                      np.random.rand(X.shape[0], self.latent_dimension)),

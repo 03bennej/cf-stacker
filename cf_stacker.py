@@ -129,7 +129,7 @@ class CFStacker(BaseEstimator):
             self.threshold = thresholds(X, y)  # calculate variable thresholds using fmeasure
 
         self.unreliable_probs_labels = np.abs(X - np.expand_dims(y, axis=1))  # define unreliable probabilities
-
+        print(np.sort(np.matrix.flatten(self.unreliable_probs_labels)))
         self.basemodel.fit(X, self.unreliable_probs_labels)  # fit model to learn unreliable probabilities
 
         self.unreliable_probs_train = self.basemodel.predict(X)

@@ -204,7 +204,7 @@ class CFStacker(BaseEstimator):
                                                     W=W_init,
                                                     H=self.H)
             self.H = self.nmf_predict.components_
-            self.X_comb_reestimated = np.matmul(self.W, self.H)
+            self.X_comb_reestimated = self.W @ self.H
 
             X_predict = self.X_comb_reestimated[self.X_train_shape[0]::, :]
 

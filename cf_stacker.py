@@ -112,6 +112,7 @@ class CFStacker(BaseEstimator):
         self.nmf_train = None
         self.X_train_masked = None
         self.mask_train = None
+        self.unreliable_probs_labels = None
         self.unreliable_probs_train = None
 
         self.X_predict_masked = None
@@ -125,9 +126,11 @@ class CFStacker(BaseEstimator):
         if self.threshold == 'variable':
             self.threshold = thresholds(X, y)  # calculate variable thresholds using fmeasure
 
-        self.unreliable_probs_train = np.abs(X - np.expand_dims(y, axis=1))  # define unreliable probabilities
+        self.unreliable_probs_labels = np.abs(X - np.expand_dims(y, axis=1))  # define unreliable probabilities
 
-        self.basemodel.fit(X, self.unreliable_probs_train)  # fit model to learn unreliable probabilities
+        self.basemodel.fit(X, self.unreliable_probs_labels)  # fit model to learn unreliable probabilities
+
+        self.unreliable_probs_train = self.basemodel.predict(X)
 
         self.mask_train = generate_mask(self.unreliable_probs_train,
                                         threshold=self.threshold)

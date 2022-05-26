@@ -103,7 +103,7 @@ class CFStacker(BaseEstimator):
         self.alpha_nmf = alpha_nmf
         self.max_iter_nmf = max_iter_nmf
         self.tol_nmf = tol_nmf
-        self.l1_ratio = l1_ratio_nmf
+        self.l1_ratio_nmf = l1_ratio_nmf
         self.nmf = nmf
         self.return_probs = return_probs
         self.method = method
@@ -167,7 +167,7 @@ class CFStacker(BaseEstimator):
                                  init='custom',
                                  solver='mu',
                                  tol=self.tol_nmf,
-                                 l1_ratio=self.l1_ratio,
+                                 l1_ratio=self.l1_ratio_nmf,
                                  alpha=self.alpha_nmf,
                                  update_H=True)
 
@@ -219,7 +219,7 @@ class CFStacker(BaseEstimator):
                                    init='custom',
                                    solver='mu',
                                    tol=self.tol_nmf,
-                                   l1_ratio=self.l1_ratio,
+                                   l1_ratio=self.l1_ratio_nmf,
                                    alpha=self.alpha_nmf,
                                    update_H=True)
 

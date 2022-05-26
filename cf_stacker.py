@@ -58,9 +58,7 @@ def apply_mask(data, mask, target=np.nan):
     print(mask)
     #print(mask[:,0])
     data_new = np.copy(data)
-    if mask is False:
-        continue
-    else:
+    if isinstance(mask, np.ndarray):
         data_new[mask] = target
         total_entries = len(np.matrix.flatten(mask))
         total_unreliable_probs = len(np.matrix.flatten(mask[mask]))

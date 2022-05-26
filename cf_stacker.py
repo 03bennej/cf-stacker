@@ -66,6 +66,7 @@ def restore_reliable_probs(data_new,
     data_new[np.invert(mask)] = data_old.to_numpy()[np.invert(mask)]
     return data_new
 
+
 def list_to_matrix(probs_list):
     if type(probs_list) is list:
         list_len = len(probs_list)
@@ -142,8 +143,13 @@ class CFStacker(BaseEstimator):
         #                                  mask=self.mask_train,
         #                                  target=np.nan)
 
-        self.X_train_masked = np.ma.masked_where(condition=(X >= .5 - self.threshold) & (X <= .5 + self.threshold),
-                                                 a=X).data
+        self.mask_train = np.ma.masked_where(condition=(X >= .5 - self.threshold) & (X <= .5 + self.threshold),
+                                             a=X,
+                                             ).mask
+
+        self.X_train_masked = apply_mask(data=X,
+                                         mask=self.mask_train,
+                                         target=np.nan)
 
         if self.nmf:
             self.X_train_shape = np.shape(X)
@@ -188,8 +194,12 @@ class CFStacker(BaseEstimator):
         #                                    mask=self.mask_predict,
         #                                    target=np.nan)
 
-        self.X_predict_masked = np.ma.masked_where(condition=(X >= .5 - self.threshold) & (X <= .5 + self.threshold),
-                                                   a=X).data
+        self.mask_predict = np.ma.masked_where(condition=(X >= .5 - self.threshold) & (X <= .5 + self.threshold),
+                                               a=X).data
+
+        self.X_predict_masked = apply_mask(data=X,
+                                           mask=self.mask_predict,
+                                           target=np.nan)
 
         if self.nmf:
 

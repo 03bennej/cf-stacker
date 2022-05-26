@@ -50,7 +50,7 @@ def generate_mask(unreliable_probs,
     mask = 0.45 <= unreliable_probs <= 0.55
     total_entries = len(np.matrix.flatten(mask))
     total_unreliable_probs = len(np.matrix.flatten(mask[mask]))
-    print("Percentage removed", total_unreliable_probs/total_entries)
+    # print("Percentage removed", total_unreliable_probs/total_entries)
     return mask
 
 

@@ -234,11 +234,10 @@ class CFStacker(BaseEstimator):
             #                         axis=0)
 
             W_init = np.random.rand(self.X_comb_masked.shape[0], self.latent_dimension)
-            H_init = np.random.rand(self.latent_dimension, self.X_comb_masked.shape[1])
 
             self.W = self.nmf_predict.fit_transform(self.X_comb_masked,
                                                     W=W_init,
-                                                    H=H_init)#self.H)
+                                                    H=self.H)
             self.H = self.nmf_predict.components_
             self.X_comb_reestimated = matmul_nmf(self.W, self.H)
 

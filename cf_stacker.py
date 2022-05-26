@@ -184,7 +184,7 @@ class CFStacker(BaseEstimator):
                 self.output_model.fit(X_temp, y)
             else:
                 self.output_model.fit(X, y)
-
+        print('done')
         return self
 
     def predict(self, X):

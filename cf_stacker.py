@@ -146,7 +146,8 @@ class CFStacker(BaseEstimator):
         # self.X_train_masked = apply_mask(data=X,
         #                                  mask=self.mask_train,
         #                                  target=np.nan)
-
+        print(X)
+        (X >= .5 - self.threshold) & (X <= .5 + self.threshold)
         self.mask_train = np.ma.masked_where(condition=(X >= .5 - self.threshold) & (X <= .5 + self.threshold),
                                              a=X,
                                              ).mask

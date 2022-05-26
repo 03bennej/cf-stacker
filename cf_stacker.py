@@ -57,9 +57,10 @@ def generate_mask(unreliable_probs,
 def apply_mask(data, mask, target=np.nan):
     #print(mask[:,0])
     data_new = np.copy(data)
-    data_new[mask] = target
-    total_entries = len(np.matrix.flatten(mask))
-    total_unreliable_probs = len(np.matrix.flatten(mask[mask]))
+    if mask is not False:
+        data_new[mask] = target
+        total_entries = len(np.matrix.flatten(mask))
+        total_unreliable_probs = len(np.matrix.flatten(mask[mask]))
     # print("Percentage removed", total_unreliable_probs/total_entries)
     return data_new
 

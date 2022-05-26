@@ -46,8 +46,8 @@ def thresholds(X, y, beta=1):
 
 def generate_mask(unreliable_probs,
                   threshold=0.5):
-    # mask = unreliable_probs >= threshold
-    _, mask = np.ma.masked_where((unreliable_probs >= 0.45) & (unreliable_probs <= 0.55), unreliable_probs)
+    mask = unreliable_probs >= threshold
+    # _, mask = np.ma.masked_where((unreliable_probs >= 0.45) & (unreliable_probs <= 0.55), unreliable_probs)
     total_entries = len(np.matrix.flatten(mask))
     total_unreliable_probs = len(np.matrix.flatten(mask[mask]))
     # print("Percentage removed", total_unreliable_probs/total_entries)

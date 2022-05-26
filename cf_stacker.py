@@ -55,6 +55,7 @@ def generate_mask(unreliable_probs,
 
 
 def apply_mask(data, mask, target=np.nan):
+    print(mask)
     data_new = np.copy(data)
     data_new[mask] = target
     total_entries = len(np.matrix.flatten(mask))

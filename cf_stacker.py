@@ -150,6 +150,7 @@ class CFStacker(BaseEstimator):
         print(((X >= .5 - self.threshold) & (X <= .5 + self.threshold)).to_numpy())
         print(X.to_numpy()[0,:])
         print(X.to_numpy()[:,0])
+        print(np.max(X.to_numpy()[:,0]))
         self.mask_train = np.ma.masked_where(condition=(X >= .5 - self.threshold) & (X <= .5 + self.threshold),
                                              a=X,
                                              ).mask

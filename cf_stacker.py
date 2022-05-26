@@ -219,7 +219,7 @@ class CFStacker(BaseEstimator):
         if self.nmf:
 
             self.X_comb_masked = np.concatenate((self.X_train_masked, self.X_predict_masked), axis=0)
-
+            print(X_comb_masked.to_numpy())
             self.nmf_predict = NMF(n_components=self.latent_dimension,
                                    max_iter=self.max_iter_nmf,
                                    init='custom',
@@ -240,7 +240,7 @@ class CFStacker(BaseEstimator):
                                                     H=self.H)
             self.H = self.nmf_predict.components_
             self.X_comb_reestimated = matmul_nmf(self.W, self.H)
-
+            print(self.X_comb_reestimated)
             X_predict = self.X_comb_reestimated[self.X_train_shape[0]::, :]
 
             # X_predict = restore_reliable_probs(data_new=X_predict,

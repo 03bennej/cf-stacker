@@ -173,11 +173,12 @@ class CFStacker(BaseEstimator):
 
             W_init = np.random.rand(X.shape[0], self.latent_dimension)
             H_init = np.random.rand(self.latent_dimension, X.shape[1])
-            print('done')
             self.W_train = self.nmf_train.fit_transform(self.X_train_masked,
                                                         W=W_init,
                                                         H=H_init)
             self.H = self.nmf_train.components_
+
+            print(self.W_train @ self.H)
 
         if self.method == 'lr':
             if self.nmf:

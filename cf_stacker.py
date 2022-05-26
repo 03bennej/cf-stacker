@@ -232,7 +232,6 @@ class CFStacker(BaseEstimator):
                                                     H=self.H)
             self.H = self.nmf_predict.components_
             self.X_comb_reestimated = matmul_nmf(self.W, self.H)
-            print(self.X_comb_reestimated)
             X_predict = self.X_comb_reestimated[self.X_train_shape[0]::, :]
 
             # X_predict = restore_reliable_probs(data_new=X_predict,

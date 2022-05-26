@@ -55,7 +55,7 @@ def generate_mask(unreliable_probs,
 
 
 def apply_mask(data, mask, target=np.nan):
-    print(mask[:,0])
+    #print(mask[:,0])
     data_new = np.copy(data)
     data_new[mask] = target
     total_entries = len(np.matrix.flatten(mask))
@@ -197,7 +197,7 @@ class CFStacker(BaseEstimator):
         # self.X_predict_masked = apply_mask(data=X,
         #                                    mask=self.mask_predict,
         #                                    target=np.nan)
-
+        print((X >= .5 - self.threshold) & (X <= .5 + self.threshold))
         self.mask_predict = np.ma.masked_where(condition=(X >= .5 - self.threshold) & (X <= .5 + self.threshold),
                                                a=X).mask
 

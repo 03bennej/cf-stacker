@@ -83,6 +83,13 @@ def list_to_matrix(probs_list):
     return matrix
 
 
+def matmul_nmf(W, H):
+    X_new = W @ H
+    X_new[X_new > 1] = 1
+    X_new[X_new < 0] = 0
+    return X_new
+
+
 class CFStacker(BaseEstimator):
 
     def __init__(self,
@@ -180,14 +187,14 @@ class CFStacker(BaseEstimator):
                                                         H=H_init)
             self.H = self.nmf_train.components_
 
-            print(self.W_train @ self.H)
+            print(matmul_nmf(self.W_train, self.H))
 
         if self.method == 'lr':
             if self.nmf:
                 # X_temp = restore_reliable_probs(data_new=self.W_train @ self.H,
                 #                                 data_old=X,
                 #                                 mask=self.mask_train)
-                X_temp = self.W_train @ self.H
+                X_temp = matmul_nmf(self.W_train, self.H)
                 self.output_model.fit(X_temp, y)
             else:
                 self.output_model.fit(X, y)
@@ -232,7 +239,7 @@ class CFStacker(BaseEstimator):
                                                     W=W_init,
                                                     H=self.H)
             self.H = self.nmf_predict.components_
-            self.X_comb_reestimated = self.W @ self.H
+            self.X_comb_reestimated = matmul_nmf(self.W, self.H)
 
             X_predict = self.X_comb_reestimated[self.X_train_shape[0]::, :]
 

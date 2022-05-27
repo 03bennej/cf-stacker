@@ -153,13 +153,13 @@ class CFStacker(BaseEstimator):
                                          mask=self.mask_train,
                                          target=np.nan)
 
-        # self.mask_train = np.ma.masked_where(condition=(X > .5 - self.threshold) & (X < .5 + self.threshold),
-        #                                      a=X,
-        #                                      ).mask
-        #
-        # self.X_train_masked = apply_mask(data=X,
-        #                                  mask=self.mask_train,
-        #                                  target=np.nan)
+        self.mask_train2 = np.ma.masked_where(condition=(X > .5 - 0.05) & (X < .5 + 0.05),
+                                             a=X,
+                                             ).mask
+
+        self.X_train_masked = apply_mask(data=self.X_train_masked,
+                                         mask=self.mask_train2,
+                                         target=np.nan)
 
         if self.nmf:
             self.X_train_shape = np.shape(X)
@@ -202,12 +202,12 @@ class CFStacker(BaseEstimator):
         self.X_predict_masked = apply_mask(data=X,
                                            mask=self.mask_predict,
                                            target=np.nan)
-        # self.mask_predict = np.ma.masked_where(condition=(X > .5 - self.threshold) & (X < .5 + self.threshold),
-        #                                        a=X).mask
-        #
-        # self.X_predict_masked = apply_mask(data=X,
-        #                                    mask=self.mask_predict,
-        #                                    target=np.nan)
+        self.mask_predict2 = np.ma.masked_where(condition=(X > .5 - 0.05) & (X < .5 + 0.05),
+                                               a=X).mask
+
+        self.X_predict_masked = apply_mask(data=self.X_predict_masked,
+                                           mask=self.mask_predict2,
+                                           target=np.nan)
 
         if self.nmf:
 

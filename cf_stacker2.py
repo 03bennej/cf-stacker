@@ -98,7 +98,7 @@ def optimize(X, W, H, C, mu, b1, b2, lamW, lamH, optimizer, tol, max_iter,
             print("step: %i, loss: %f" % (step, loss))
             
         if step == (max_iter):
-            print("Increase max_iter: unable to meet convergence criteria")
+            print("Increase max_iter: WARNING, unable to meet convergence criteria")
             break
 
 

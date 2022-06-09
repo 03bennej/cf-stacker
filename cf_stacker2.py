@@ -227,7 +227,7 @@ class CFStacker(BaseEstimator):
 
     def fit(self, X, y):
 
-        self.X_train = X
+        self.X_train = np.copy(X)
 
         # confidence is based on distance from label
         self.C_labels = 1 - np.abs(X - np.expand_dims(y, axis=1))

@@ -36,8 +36,9 @@ def obj_fun(X_true, W, H, C, mu, b1, b2, lamW, lamH):
     # C[C >= 0.5] = 1
     # C[C < 0.5] = 0
     X_pred = model(W, H, mu, b1, b2)
-    C = tf.constant(C, dtype=tf.dtypes.float32)
-    wmse = tf.reduce_mean(tf.math.multiply(C, tf.pow(X_true - X_pred, 2)))
+    Cpow = tf.pow(tf.constant(C, dtype=tf.dtypes.float32), 2)
+    Cpow = Cpow / tf.reduce_max(Cpow)
+    wmse = tf.reduce_mean(tf.math.multiply(Cpow, tf.pow(X_true - X_pred, 2)))
     reg = lamW * tf.reduce_mean(tf.pow(W, 2)) + lamH * tf.reduce_mean(tf.pow(H, 2))
     return wmse + reg
 
@@ -225,7 +226,7 @@ class CFStacker(BaseEstimator):
         self.X_train = np.copy(X)
 
         # confidence is based on distance from label
-        self.C_labels = (1 - np.abs(X - np.expand_dims(y, axis=1))) ** 2
+        self.C_labels = 1 - np.abs(X - np.expand_dims(y, axis=1))
 
         self.basemodel.fit(X, self.C_labels)  # fit confidence model
 

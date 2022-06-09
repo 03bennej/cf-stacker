@@ -141,15 +141,15 @@ class MatrixFactorization(BaseEstimator):
 
         self.X_shape = np.shape(X)
 
-        self.W = tf.Variable(self.initializer(shape = [self.X_shape[0],
+        self.W = tf.Variable(self.initializer(shape=[self.X_shape[0],
                                                         self.latent_dim],
                                    dtype = tf.dtypes.float32),
                                    trainable = True)
 
         self.H = tf.Variable(self.initializer(shape = [self.latent_dim,
                                                   self.X_shape[1]],
-                             dtype = tf.dtypes.float32),
-                             trainable = True)
+                             dtype=tf.dtypes.float32),
+                             trainable=True)
 
         self.mu, self.b1, self.b2 = calculate_biases(X)
 
@@ -242,17 +242,17 @@ class CFStacker(BaseEstimator):
 
         self.C_train = self.C_labels #np.clip(self.basemodel.predict(X), a_min = 0, a_max = 1)
 
-        self.mf_model = MatrixFactorization(latent_dim=self.latent_dim,
-                                            C=self.C_train,
-                                            lamW=self.lamW,
-                                            lamH=self.lamH,
-                                            tol=self.tol,
-                                            max_iter=self.max_iter,
-                                            learning_rate=self.learning_rate)
-
-        self.mf_model.fit_transform(X)
-
-        self.X_train_new, self.training_params = self.mf_model.apply_transform()
+        # self.mf_model = MatrixFactorization(latent_dim=self.latent_dim,
+        #                                     C=self.C_train,
+        #                                     lamW=self.lamW,
+        #                                     lamH=self.lamH,
+        #                                     tol=self.tol,
+        #                                     max_iter=self.max_iter,
+        #                                     learning_rate=self.learning_rate)
+        #
+        # self.mf_model.fit_transform(X)
+        #
+        # self.X_train_new, self.training_params = self.mf_model.apply_transform()
 
         return self
 

@@ -241,6 +241,7 @@ class CFStacker(BaseEstimator):
         self.basemodel.fit(X, self.C_labels) # fit confidence model
 
         self.C_train = self.C_labels
+
         # self.C_train = np.clip(self.basemodel.predict(X), a_min=0, a_max=1)
 
         # self.mf_model = MatrixFactorization(latent_dim=self.latent_dim,

@@ -7,6 +7,7 @@ Created on Mon Jun  6 15:37:28 2022
 """
 
 import tensorflow as tf
+from tensorflow import keras
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -121,7 +122,7 @@ class MatrixFactorization(BaseEstimator):
         self.max_iter = max_iter
         self.learning_rate = learning_rate
         self.optimizer = tf.optimizers.Adam(self.learning_rate)
-        self.initializer = tf.keras.initializers.RandomUniform(minval=0, 
+        self.initializer = keras.initializers.RandomUniform(minval=0,
                                                                maxval=1, 
                                                                seed=None)
         
@@ -309,7 +310,7 @@ if __name__ == "__main__":
     #                                 max_iter=5000,
     #                                 learning_rate=0.05)
     
-    # initializer = tf.keras.initializers.RandomUniform(minval=0, 
+    # initializer = keras.initializers.RandomUniform(minval=0,
     #                                                   maxval=1, 
     #                                                   seed=None)
     

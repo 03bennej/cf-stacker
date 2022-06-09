@@ -30,15 +30,15 @@ def calculate_biases(X):
     mu2 = np.transpose(
           np.broadcast_to(np.mean(X, axis=1), tuple(reversed(X.shape))))
 
-    mu = tf.constant(mu, dtype = tf.dtypes.float32)
-    b1 = tf.constant(mu1 - mu, dtype = tf.dtypes.float32)
-    b2 = tf.constant(mu2 - mu, dtype = tf.dtypes.float32)     
+    mu = tf.constant(mu, dtype=tf.dtypes.float32)
+    b1 = tf.constant(mu1 - mu, dtype=tf.dtypes.float32)
+    b2 = tf.constant(mu2 - mu, dtype=tf.dtypes.float32)
     return mu, b1, b2
 
 
 def obj_fun(X_true, W, H, C, mu, b1, b2, lamW, lamH):
     X_pred = model(W, H, mu, b1, b2)
-    wmse = tf.reduce_mean(tf.math.multiply(C**4, tf.pow(X_true - X_pred, 2)))
+    wmse = tf.reduce_mean(tf.math.multiply(tf.pow(C, 4), tf.pow(X_true - X_pred, 2)))
     reg = lamW*tf.reduce_mean(tf.pow(W, 2)) + lamH*tf.reduce_mean(tf.pow(H, 2))
     return wmse + reg
 

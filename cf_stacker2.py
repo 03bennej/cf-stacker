@@ -208,6 +208,7 @@ class CFStacker(BaseEstimator):
         if self.method == 'lr':
             self.output_model = LogisticRegression()
 
+        self.X_train = None
         self.X_train_shape = None
         self.X_comb_reestimated = None
         self.X_predict = None

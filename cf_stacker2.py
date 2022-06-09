@@ -38,7 +38,7 @@ def calculate_biases(X):
 
 def obj_fun(X_true, W, H, C, mu, b1, b2, lamW, lamH):
     X_pred = model(W, H, mu, b1, b2)
-    wmse = tf.reduce_mean(tf.math.multiply(C, tf.pow(X_true - X_pred, 2)))
+    wmse = tf.reduce_mean(tf.math.multiply(C*C, tf.pow(X_true - X_pred, 2)))
     reg = lamW*tf.reduce_mean(tf.pow(W, 2)) + lamH*tf.reduce_mean(tf.pow(H, 2))
     return wmse + reg
 
@@ -93,7 +93,7 @@ def optimize(X, W, H, C, mu, b1, b2, lamW, lamH, optimizer, tol, max_iter,
 
         step = step + 1
 
-        if step % 10 == 0:
+        if step % 50 == 0:
 
             print("step: %i, loss: %f" % (step, loss))
 
@@ -110,9 +110,9 @@ class MatrixFactorization(BaseEstimator):
                  C=1,
                  lamW=0.0,
                  lamH=0.0,
-                 tol = 0.0001,
-                 max_iter = 500,
-                 learning_rate = 0.1):
+                 tol=0.0001,
+                 max_iter=500,
+                 learning_rate=0.1):
 
         self.latent_dim = latent_dim
         self.C = C
@@ -249,7 +249,6 @@ class CFStacker(BaseEstimator):
         self.mf_model.fit_transform(X)
 
         self.X_train_new, self.training_params = self.mf_model.apply_transform()
-
 
         return self
 

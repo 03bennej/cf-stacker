@@ -181,7 +181,7 @@ class MatrixFactorization(BaseEstimator):
 
     def apply_transform(self):
         X_new = model(self.W, self.H, self.mu, self.b1, self.b2)
-        X_new = np.clip(X_new, a_min = 0.0, a_max = 1.0)
+        X_new = np.clip(X_new, a_min=0.0, a_max=1.0)
         parameters = {"W": self.W,
                       "H": self.H,
                       "mu": self.mu,
@@ -195,12 +195,12 @@ class CFStacker(BaseEstimator):
     def __init__(self,
                   base_estimator,
                   latent_dim,
-                  matrix_factorization = True,
+                  matrix_factorization=True,
                   method='mean',
                   lamW=0.0,
                   lamH=0.0,
-                  tol = 0.0001,
-                  max_iter = 500,
+                  tol=0.0001,
+                  max_iter=500,
                   learning_rate=0.1
                   ):
 

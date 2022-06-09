@@ -192,7 +192,6 @@ class CFStacker(BaseEstimator):
                   latent_dim,
                   matrix_factorization = True,
                   method='mean',
-                  C=1,
                   lamW=0.0,
                   lamH=0.0,
                   tol = 0.0001,
@@ -204,7 +203,6 @@ class CFStacker(BaseEstimator):
         self.latent_dim = latent_dim
         self.matrix_factorization = matrix_factorization
         self.method = method
-        self.C = C
         self.lamW = lamW
         self.lamH = lamH
         self.tol = tol

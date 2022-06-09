@@ -37,15 +37,12 @@ def calculate_biases(X):
 
 
 def obj_fun(X_true, W, H, C, mu, b1, b2, lamW, lamH):
-    X_pred = model(W, H, mu, b1, b2)
-    wmse = tf.reduce_mean(tf.math.multiply(C*C, tf.pow(X_true - X_pred, 2)))
-    reg = lamW*tf.reduce_mean(tf.pow(W, 2)) + lamH*tf.reduce_mean(tf.pow(H, 2))
-    return wmse + reg
-
-def C_fun(C):
     C[C >= 0.5] = 1
     C[C < 0.5] = 0
-    return C
+    X_pred = model(W, H, mu, b1, b2)
+    wmse = tf.reduce_mean(tf.math.multiply(C, tf.pow(X_true - X_pred, 2)))
+    reg = lamW*tf.reduce_mean(tf.pow(W, 2)) + lamH*tf.reduce_mean(tf.pow(H, 2))
+    return wmse + reg
 
 def optimize_W(X, W, H, C, mu, b1, b2, lamW, lamH, optimizer):
 
@@ -241,7 +238,7 @@ class CFStacker(BaseEstimator):
 
         self.basemodel.fit(X, self.C_labels) # fit confidence model
 
-        self.C_train = C_fun(self.C_labels) #np.clip(self.basemodel.predict(X), a_min = 0, a_max = 1)
+        self.C_train = self.C_labels #np.clip(self.basemodel.predict(X), a_min = 0, a_max = 1)
 
         self.mf_model = MatrixFactorization(latent_dim=self.latent_dim,
                                             C=self.C_train,
@@ -264,7 +261,7 @@ class CFStacker(BaseEstimator):
 
         self.C_comb = np.concatenate((self.C_train, self.C_test), axis=0)
 
-        self.C_comb = C_fun(self.C_comb)
+        self.C_comb = self.C_comb
 
         self.X_comb = np.concatenate((self.X_train, X), axis=0)
 

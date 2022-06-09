@@ -93,7 +93,7 @@ def optimize(X, W, H, C, mu, b1, b2, lamW, lamH, optimizer, tol, max_iter,
         
         step = step + 1
             
-        if step % 10 == 0:
+        if step % 50 == 0:
 
             print("step: %i, loss: %f" % (step, loss))
             
@@ -250,7 +250,6 @@ class CFStacker(BaseEstimator):
             
         self.X_train_new, self.training_params = self.mf_model.apply_transform()
 
-
         return self
 
 
@@ -280,7 +279,7 @@ class CFStacker(BaseEstimator):
             self.X_predict = np.nanmean(self.X_predict, axis=1)
         elif self.method == 'median':
             self.X_predict = np.nanmedian(self.X_predict, axis=1)
-        
+
         return self.X_predict
 
 

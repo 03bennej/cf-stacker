@@ -16,6 +16,7 @@ from sklearn.base import BaseEstimator
 from sklearn.multioutput import MultiOutputClassifier, MultiOutputRegressor
 from sklearn.linear_model import LogisticRegression, LinearRegression
 
+
 def generate_mf_model(W, H, mu, b1, b2):
     return tf.linalg.matmul(W, H) + mu + b1 + b2
 
@@ -28,38 +29,36 @@ def calculate_biases(X):
     mu = np.broadcast_to(np.mean(X), X.shape)
     mu1 = np.broadcast_to(np.mean(X, axis=0), X.shape)
     mu2 = np.transpose(
-          np.broadcast_to(np.mean(X, axis=1), tuple(reversed(X.shape))))
+        np.broadcast_to(np.mean(X, axis=1), tuple(reversed(X.shape))))
 
-    mu = tf.constant(mu, dtype = tf.dtypes.float32)
-    b1 = tf.constant(mu1 - mu, dtype = tf.dtypes.float32)
-    b2 = tf.constant(mu2 - mu, dtype = tf.dtypes.float32)
+    mu = tf.constant(mu, dtype=tf.dtypes.float32)
+    b1 = tf.constant(mu1 - mu, dtype=tf.dtypes.float32)
+    b2 = tf.constant(mu2 - mu, dtype=tf.dtypes.float32)
     return mu, b1, b2
 
 
 def obj_fun(X_true, W, H, C, mu, b1, b2, lamW, lamH):
-    #C[C >= 0.5] = 1
-    #C[C < 0.5] = 0
+    # C[C >= 0.5] = 1
+    # C[C < 0.5] = 0
     X_pred = model(W, H, mu, b1, b2)
     Cpow = tf.pow(tf.constant(C, dtype=tf.dtypes.float32), 2)
     Cpow = Cpow / tf.reduce_max(Cpow)
     wmse = tf.reduce_mean(tf.math.multiply(Cpow, tf.pow(X_true - X_pred, 2)))
-    reg = lamW*tf.reduce_mean(tf.pow(W, 2)) + lamH*tf.reduce_mean(tf.pow(H, 2))
+    reg = lamW * tf.reduce_mean(tf.pow(W, 2)) + lamH * tf.reduce_mean(tf.pow(H, 2))
     return wmse + reg
 
+
 def optimize_W(X, W, H, C, mu, b1, b2, lamW, lamH, optimizer):
-
     with tf.GradientTape() as tape:
-
         loss = obj_fun(X, W, H, C, mu, b1, b2, lamW, lamH)
 
     gradients = tape.gradient(loss, [W])
 
     optimizer.apply_gradients(zip(gradients, [W]))
 
+
 def optimize_H(X, W, H, C, mu, b1, b2, lamW, lamH, optimizer):
-
     with tf.GradientTape() as tape:
-
         loss = obj_fun(X, W, H, C, mu, b1, b2, lamW, lamH)
 
     gradients = tape.gradient(loss, [H])
@@ -68,15 +67,13 @@ def optimize_H(X, W, H, C, mu, b1, b2, lamW, lamH, optimizer):
 
 
 def optimization_step(X, W, H, C, mu, b1, b2, lamW, lamH, optimizer):
-
     optimize_W(X, W, H, C, mu, b1, b2, lamW, lamH, optimizer)
 
     optimize_H(X, W, H, C, mu, b1, b2, lamW, lamH, optimizer)
 
 
 def optimize(X, W, H, C, mu, b1, b2, lamW, lamH, optimizer, tol, max_iter,
-             partial = False):
-
+             partial=False):
     step = 0
 
     X_tf = tf.constant(X, dtype=tf.dtypes.float32)
@@ -98,7 +95,6 @@ def optimize(X, W, H, C, mu, b1, b2, lamW, lamH, optimizer, tol, max_iter,
         step = step + 1
 
         if step % 50 == 0:
-
             print("epoch: %i, loss: %f" % (step, loss))
 
         if step == (max_iter):
@@ -108,7 +104,6 @@ def optimize(X, W, H, C, mu, b1, b2, lamW, lamH, optimizer, tol, max_iter,
 
 class MatrixFactorization(BaseEstimator):
 
-
     def __init__(self,
                  latent_dim=5,
                  C=1,
@@ -117,7 +112,6 @@ class MatrixFactorization(BaseEstimator):
                  tol=0.0001,
                  max_iter=500,
                  learning_rate=0.1):
-
         self.latent_dim = latent_dim
         self.C = C
         self.lamW = lamW
@@ -127,8 +121,8 @@ class MatrixFactorization(BaseEstimator):
         self.learning_rate = learning_rate
         self.optimizer = keras.optimizers.Adam(self.learning_rate)
         self.initializer = keras.initializers.RandomUniform(minval=0,
-                                                               maxval=1,
-                                                               seed=None)
+                                                            maxval=1,
+                                                            seed=None)
 
         self.X_shape = None
         self.W = None
@@ -138,17 +132,16 @@ class MatrixFactorization(BaseEstimator):
         self.b2 = None
 
     def fit_transform(self, X):
-
         self.X_shape = np.shape(X)
 
         self.W = tf.Variable(self.initializer(shape=[self.X_shape[0],
-                                                        self.latent_dim],
-                                   dtype = tf.dtypes.float32),
-                                   trainable = True)
+                                                     self.latent_dim],
+                                              dtype=tf.dtypes.float32),
+                             trainable=True)
 
-        self.H = tf.Variable(self.initializer(shape = [self.latent_dim,
-                                                  self.X_shape[1]],
-                             dtype=tf.dtypes.float32),
+        self.H = tf.Variable(self.initializer(shape=[self.latent_dim,
+                                                     self.X_shape[1]],
+                                              dtype=tf.dtypes.float32),
                              trainable=True)
 
         self.mu, self.b1, self.b2 = calculate_biases(X)
@@ -158,15 +151,13 @@ class MatrixFactorization(BaseEstimator):
 
         return self
 
-
     def partial_fit_transform(self, X, H):
-
         self.X_shape = np.shape(X)
 
         self.W = tf.Variable(self.initializer(shape=[self.X_shape[0],
-                                                        self.latent_dim],
-                                   dtype=tf.dtypes.float32),
-                                   trainable=True)
+                                                     self.latent_dim],
+                                              dtype=tf.dtypes.float32),
+                             trainable=True)
 
         self.H = H
 
@@ -177,7 +168,6 @@ class MatrixFactorization(BaseEstimator):
                  partial=True)
 
         return self
-
 
     def apply_transform(self):
         X_new = model(self.W, self.H, self.mu, self.b1, self.b2)
@@ -193,16 +183,16 @@ class MatrixFactorization(BaseEstimator):
 class CFStacker(BaseEstimator):
 
     def __init__(self,
-                  base_estimator,
-                  latent_dim,
-                  matrix_factorization=True,
-                  method='mean',
-                  lamW=0.0,
-                  lamH=0.0,
-                  tol=0.0001,
-                  max_iter=500,
-                  learning_rate=0.1
-                  ):
+                 base_estimator,
+                 latent_dim,
+                 matrix_factorization=True,
+                 method='mean',
+                 lamW=0.0,
+                 lamH=0.0,
+                 tol=0.0001,
+                 max_iter=500,
+                 learning_rate=0.1
+                 ):
 
         self.base_estimator = base_estimator
         self.latent_dim = latent_dim
@@ -218,18 +208,22 @@ class CFStacker(BaseEstimator):
         if self.method == 'lr':
             self.output_model = LogisticRegression()
 
-        self.X_comb_masked = None
         self.X_train_shape = None
         self.X_comb_reestimated = None
+        self.X_predict = None
         self.H = None
         self.W_train = None
         self.C_labels = None
         self.C_train = None
-
+        self.C_comb = None
+        self.X_comb = None
+        self.X_comb_new = None
+        self.X_comb_params = None
         self.C_predict = None
+
+        self.mf_model = None
         self.W = None
         self.nmf_predict = None
-
 
     def fit(self, X, y):
 
@@ -238,7 +232,7 @@ class CFStacker(BaseEstimator):
         # confidence is based on distance from label
         self.C_labels = 1 - np.abs(X - np.expand_dims(y, axis=1))
 
-        self.basemodel.fit(X, self.C_labels) # fit confidence model
+        self.basemodel.fit(X, self.C_labels)  # fit confidence model
 
         self.C_train = self.C_labels
 
@@ -258,14 +252,11 @@ class CFStacker(BaseEstimator):
 
         return self
 
-
     def predict(self, X):
 
-        self.C_test = np.clip(self.basemodel.predict(X), a_min=0, a_max=1)
+        self.C_predict = np.clip(self.basemodel.predict(X), a_min=0, a_max=1)
 
         self.C_comb = np.concatenate((self.C_train, self.C_test), axis=0)
-
-        self.C_comb = self.C_comb
 
         self.X_comb = np.concatenate((self.X_train, X), axis=0)
 
@@ -290,13 +281,11 @@ class CFStacker(BaseEstimator):
 
         return self.X_predict
 
-
     def _generate_basemodel(self):
         return MultiOutputRegressor(estimator=self.base_estimator)
 
 
 if __name__ == "__main__":
-
     train_data = pd.read_csv('validation-10000.csv.gz')
     test_data = pd.read_csv('predictions-10000.csv.gz')
     train_data = train_data.drop(["id"], axis=1)
@@ -311,8 +300,7 @@ if __name__ == "__main__":
 
     X = X_train
 
-
-#
+    #
     # mf_model = MatrixFactorization(latent_dim = 8,
     #                                 max_iter=5000,
     #                                 learning_rate=0.05)

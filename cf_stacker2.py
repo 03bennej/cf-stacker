@@ -252,7 +252,7 @@ class CFStacker(BaseEstimator):
 
         self.C_predict = np.clip(self.basemodel.predict(X), a_min=0, a_max=1)
 
-        self.C_comb = np.concatenate((self.C_train, self.C_test), axis=0)
+        self.C_comb = np.concatenate((self.C_train, self.C_predict), axis=0)
 
         self.X_comb = np.concatenate((self.X_train, X), axis=0)
 

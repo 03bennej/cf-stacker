@@ -26,10 +26,10 @@ def model(W, H, mu, b1, b2):
 
 
 def calculate_biases(X):
-    mu = np.broadcast_to(np.mean(X), X.shape)
-    mu1 = np.broadcast_to(np.mean(X, axis=0), X.shape)
+    mu = np.broadcast_to(np.mean(X), X.shape) * 0
+    mu1 = np.broadcast_to(np.mean(X, axis=0), X.shape) * 0
     mu2 = np.transpose(
-        np.broadcast_to(np.mean(X, axis=1), tuple(reversed(X.shape))))
+        np.broadcast_to(np.mean(X, axis=1), tuple(reversed(X.shape)))) * 0
 
     mu = tf.constant(mu, dtype=tf.dtypes.float32)
     b1 = tf.constant(mu1 - mu, dtype=tf.dtypes.float32)

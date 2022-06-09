@@ -42,6 +42,11 @@ def obj_fun(X_true, W, H, C, mu, b1, b2, lamW, lamH):
     reg = lamW*tf.reduce_mean(tf.pow(W, 2)) + lamH*tf.reduce_mean(tf.pow(H, 2))
     return wmse + reg
 
+def C_fun(C):
+    C[C >= 0.5] = 1
+    C[C < 0.5] = 0
+    return C
+
 def optimize_W(X, W, H, C, mu, b1, b2, lamW, lamH, optimizer):
 
     with tf.GradientTape() as tape:
@@ -255,9 +260,11 @@ class CFStacker(BaseEstimator):
 
     def predict(self, X):
 
-        self.C_test = self.basemodel.predict(X)
+        self.C_test = np.clip(self.basemodel.predict(X), a_min=0, a_max=1)
 
         self.C_comb = np.concatenate((self.C_train, self.C_test), axis=0)
+
+        self.C_comb = C_fun(self.C_comb)
 
         self.X_comb = np.concatenate((self.X_train, X), axis=0)
 

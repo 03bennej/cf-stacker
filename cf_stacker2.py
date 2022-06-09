@@ -163,10 +163,10 @@ class MatrixFactorization(BaseEstimator):
 
         self.X_shape = np.shape(X)
 
-        self.W = tf.Variable(self.initializer(shape = [self.X_shape[0],
+        self.W = tf.Variable(self.initializer(shape=[self.X_shape[0],
                                                         self.latent_dim],
-                                   dtype = tf.dtypes.float32),
-                                   trainable = True)
+                                   dtype=tf.dtypes.float32),
+                                   trainable=True)
 
         self.H = H
 

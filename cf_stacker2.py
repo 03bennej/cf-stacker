@@ -121,7 +121,7 @@ class MatrixFactorization(BaseEstimator):
         self.tol = tol
         self.max_iter = max_iter
         self.learning_rate = learning_rate
-        self.optimizer = tf.optimizers.Adam(self.learning_rate)
+        self.optimizer = keras.optimizers.Adam(self.learning_rate)
         self.initializer = keras.initializers.RandomUniform(minval=0,
                                                                maxval=1, 
                                                                seed=None)

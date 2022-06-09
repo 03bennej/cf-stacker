@@ -99,7 +99,7 @@ def optimize(X, W, H, C, mu, b1, b2, lamW, lamH, optimizer, tol, max_iter,
 
         if step % 50 == 0:
 
-            print("step: %i, loss: %f" % (step, loss))
+            print("epoch: %i, loss: %f" % (step, loss))
 
         if step == (max_iter):
             print("Increase max_iter: unable to meet convergence criteria")

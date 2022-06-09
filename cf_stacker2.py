@@ -38,7 +38,7 @@ def calculate_biases(X):
 
 def obj_fun(X_true, W, H, C, mu, b1, b2, lamW, lamH):
     X_pred = model(W, H, mu, b1, b2)
-    wmse = tf.reduce_mean(tf.math.multiply(C*C, tf.pow(X_true - X_pred, 2)))
+    wmse = tf.reduce_mean(tf.math.multiply(C**4, tf.pow(X_true - X_pred, 2)))
     reg = lamW*tf.reduce_mean(tf.pow(W, 2)) + lamH*tf.reduce_mean(tf.pow(H, 2))
     return wmse + reg
 

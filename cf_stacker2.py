@@ -7,7 +7,7 @@ Created on Mon Jun  6 15:37:28 2022
 """
 
 import tensorflow as tf
-from tensorflow.keras import keras
+import tensorflow.keras as keras
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt

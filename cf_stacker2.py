@@ -17,10 +17,6 @@ from sklearn.multioutput import MultiOutputClassifier, MultiOutputRegressor
 from sklearn.linear_model import LogisticRegression, LinearRegression
 
 
-def generate_mf_model(W, H, mu, b1, b2):
-    return tf.linalg.matmul(W, H) + mu + b1 + b2
-
-
 def model(W, H, mu, b1, b2):
     return tf.linalg.matmul(W, H) + mu + b1 + b2
 
@@ -28,8 +24,7 @@ def model(W, H, mu, b1, b2):
 def calculate_biases(X):
     mu = np.broadcast_to(np.mean(X), X.shape)
     mu1 = np.broadcast_to(np.mean(X, axis=0), X.shape)
-    mu2 = np.transpose(
-        np.broadcast_to(np.mean(X, axis=1), tuple(reversed(X.shape))))
+    mu2 = np.transpose(np.broadcast_to(np.mean(X, axis=1), tuple(reversed(X.shape))))
 
     mu = tf.constant(mu, dtype=tf.dtypes.float32)
     b1 = tf.constant(mu1 - mu, dtype=tf.dtypes.float32)

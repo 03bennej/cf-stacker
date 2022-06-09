@@ -225,7 +225,7 @@ class CFStacker(BaseEstimator):
         self.X_train = np.copy(X)
 
         # confidence is based on distance from label
-        self.C_labels = 1 - np.abs(X - np.expand_dims(y, axis=1))
+        self.C_labels = (1 - np.abs(X - np.expand_dims(y, axis=1))) ** 2
 
         self.basemodel.fit(X, self.C_labels)  # fit confidence model
 

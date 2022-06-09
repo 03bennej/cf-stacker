@@ -40,7 +40,7 @@ def calculate_biases(X):
 def obj_fun(X_true, W, H, C, mu, b1, b2, lamW, lamH):
     C[C >= 0.5] = 1
     C[C < 0.5] = 0
-    # X_pred = model(W, H, mu, b1, b2)
+    X_pred = model(W, H, mu, b1, b2)
     Cpow = tf.pow(tf.constant(C, dtype=tf.dtypes.float32), 1)
     Cpow = Cpow / tf.reduce_max(Cpow)
     wmse = tf.reduce_mean(tf.math.multiply(Cpow, tf.pow(X_true - X_pred, 2)))

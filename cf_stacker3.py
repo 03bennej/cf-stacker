@@ -60,7 +60,8 @@ def define_variables(X_shape, latent_dim):
 def obj_fun(X_true, W, H, C, mu, b1, b2, lamW, lamH, W_lr, b_lr):
     X_pred = model(W, H, mu, b1, b2)
     C_pred = lr_model(X_true, W_lr, b_lr)
-    wmse = tf.reduce_mean(tf.math.multiply(C_pred, tf.pow(X_true - X_pred, 2)))
+    C_pred_binary = tf.math.round(C_pred)
+    wmse = tf.reduce_mean(tf.math.multiply(C_pred_binary, tf.pow(X_true - X_pred, 2)))
     wmse_lr = tf.reduce_mean(tf.pow(C - C_pred, 2))
     reg = lamW * tf.reduce_mean(tf.pow(W, 2)) + lamH * tf.reduce_mean(tf.pow(H, 2))
     return wmse + wmse_lr + reg

@@ -124,7 +124,7 @@ def optimize(X, W, H, C, mu, b1, b2, lamW, lamH, W_lr, b_lr, optimizer, tol, max
 
         step = step + 1
 
-        if step % 5 == 0:
+        if step % 50 == 0:
             print("epoch: %i, loss: %f" % (step, loss))
 
         if step == max_iter:

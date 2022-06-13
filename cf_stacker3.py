@@ -23,7 +23,7 @@ def model(W, H, mu, b1, b2):
 
 def lr_model(X, W_lr, b_lr):
     X_tf = tf.constant(X, dtype=tf.dtypes.float32)
-    return tf.sigmoid(tf.add(tf.matmul(X_tf, W_lr), b_lr))
+    return tf.add(tf.matmul(X_tf, W_lr), b_lr)
 
 
 def calculate_biases(X):
@@ -38,94 +38,108 @@ def calculate_biases(X):
 
 
 def define_variables(X_shape, latent_dim):
-        initializer = keras.initializers.RandomUniform(minval=0,
-                                                       maxval=0.01,
-                                                       seed=None)
-        X1, X2 = X_shape
-        W = tf.Variable(initializer(shape=[X1, latent_dim],
-                                    dtype=tf.dtypes.float32),
-                        trainable=True)
-        H = tf.Variable(initializer(shape=[latent_dim, X2],
-                                    dtype=tf.dtypes.float32),
-                        trainable=True)
-        W_lr = tf.Variable(initializer(shape=[X2, X2],
-                                    dtype=tf.dtypes.float32),
-                        trainable=True)
-        b_lr = tf.Variable(initializer(shape=[1, X2],
-                                    dtype=tf.dtypes.float32),
-                                trainable=True)
-        return W, H, W_lr, b_lr
+    initializer = keras.initializers.RandomUniform(minval=0,
+                                                   maxval=0.01,
+                                                   seed=None)
+    X1, X2 = X_shape
+    W = tf.Variable(initializer(shape=[X1, latent_dim],
+                                dtype=tf.dtypes.float32),
+                    trainable=True)
+    H = tf.Variable(initializer(shape=[latent_dim, X2],
+                                dtype=tf.dtypes.float32),
+                    trainable=True)
+    W_lr = tf.Variable(initializer(shape=[X2, X2],
+                                   dtype=tf.dtypes.float32),
+                       trainable=True)
+    b_lr = tf.Variable(initializer(shape=[1, X2],
+                                   dtype=tf.dtypes.float32),
+                       trainable=True)
+    return W, H, W_lr, b_lr
 
 
-def obj_fun(X_true, W, H, C, mu, b1, b2, lamW, lamH, W_lr, b_lr):
-    X_pred = model(W, H, mu, b1, b2)
-    C_pred = lr_model(X_true, W_lr, b_lr)
-    C_pred_binary = tf.math.round(C_pred)
-    wmse = tf.reduce_mean(tf.math.multiply(C_pred_binary, tf.pow(X_true - X_pred, 2)))
-    wmse_lr = tf.reduce_mean(tf.pow(C - C_pred, 2))
-    reg = lamW * tf.reduce_mean(tf.pow(W, 2)) + lamH * tf.reduce_mean(tf.pow(H, 2))
-    return wmse + wmse_lr + reg
+def wmse(X_true, X_pred, weights=None):
+    if weights is None:
+        return tf.reduce_mean(tf.pow(X_true - X_pred, 2))
+    else:
+        return tf.reduce_mean(tf.math.multiply(weights, tf.pow(X_true - X_pred, 2)))
 
 
-def optimize_W(X, W, H, C, mu, b1, b2, lamW, lamH, W_lr, b_lr, optimizer):
+def l2_reg(U, lam):
+    return lam * (tf.reduce_mean(tf.pow(U, 2)))
+
+
+# def obj_fun(X_true, W, H, C, mu, b1, b2, lam, W_lr, b_lr):
+#     mat_loss = matrix_completion_loss(X_true, W, H, C, mu, b1, b2, lam)
+#     conf_loss = confidence_loss(X_true, C_true, W_lr, b_lr)
+#     return mat_loss + conf_loss
+
+
+def optimize_W(X, W, H, C, mu, b1, b2, lam, optimizer):
     with tf.GradientTape() as tape:
-        loss = obj_fun(X, W, H, C, mu, b1, b2, lamW, lamH, W_lr, b_lr)
+        X_pred = model(W, H, mu, b1, b2)
+        loss = wmse(X, X_pred, C) + l2_reg(W, lam) + l2_reg(H, lam)
 
     gradients = tape.gradient(loss, [W])
 
     optimizer.apply_gradients(zip(gradients, [W]))
 
 
-def optimize_H(X, W, H, C, mu, b1, b2, lamW, lamH, W_lr, b_lr, optimizer):
+def optimize_H(X, W, H, C, mu, b1, b2, lam, optimizer):
     with tf.GradientTape() as tape:
-        loss = obj_fun(X, W, H, C, mu, b1, b2, lamW, lamH, W_lr, b_lr)
+        X_pred = model(W, H, mu, b1, b2)
+        loss = wmse(X, X_pred, C) + l2_reg(W, lam) + l2_reg(H, lam)
 
     gradients = tape.gradient(loss, [H])
 
     optimizer.apply_gradients(zip(gradients, [H]))
 
 
-def optimize_C(X, W, H, C, mu, b1, b2, lamW, lamH, W_lr, b_lr, optimizer):
+def optimize_C(X, C, W_lr, b_lr, optimizer):
     with tf.GradientTape() as tape:
-        loss = obj_fun(X, W, H, C, mu, b1, b2, lamW, lamH, W_lr, b_lr)
+        C_pred = lr_model(X, W_lr, b_lr)
+        loss = wmse(C, C_pred, weights=None)
 
     gradients = tape.gradient(loss, [W_lr, b_lr])
 
     optimizer.apply_gradients(zip(gradients, [W_lr, b_lr]))
 
 
-def optimization_step(X, W, H, C, mu, b1, b2, lamW, lamH, W_lr, b_lr, optimizer):
-    optimize_W(X, W, H, C, mu, b1, b2, lamW, lamH, W_lr, b_lr, optimizer)
+def optimization_step(X, W, H, C, mu, b1, b2, lam, W_lr, b_lr, optimizer):
+    optimize_W(X, W, H, C, mu, b1, b2, lam, optimizer)
 
-    optimize_H(X, W, H, C, mu, b1, b2, lamW, lamH, W_lr, b_lr, optimizer)
-    
-    optimize_C(X, W, H, C, mu, b1, b2, lamW, lamH, W_lr, b_lr, optimizer)
+    optimize_H(X, W, H, C, mu, b1, b2, lam, optimizer)
+
+    optimize_C(X, C, W_lr, b_lr, optimizer)
 
 
-def optimize(X, W, H, C, mu, b1, b2, lamW, lamH, W_lr, b_lr, optimizer, tol, max_iter,
+def optimize(X, W, H, C, mu, b1, b2, lam, W_lr, b_lr, optimizer, tol, max_iter,
              partial=False):
     step = 0
 
     X_tf = tf.constant(X, dtype=tf.dtypes.float32)
 
-    loss = obj_fun(X_tf, W, H, C, mu, b1, b2, lamW, lamH, W_lr, b_lr)
+    X_pred = model(W, H, mu, b1, b2)
+    C_pred = lr_model(X, W_lr, b_lr)
+    mf_loss = wmse(X, X_pred, C_pred) + l2_reg(W, lam) + l2_reg(H, lam)
+    conf_loss = wmse(C, C_pred, weights=None)
 
-    while loss > tol:
+    tot_loss = mf_loss + conf_loss
+
+    while tot_loss > tol:
 
         if partial:
 
-            optimize_W(X_tf, W, H, C, mu, b1, b2, lamW, lamH, W_lr, b_lr, optimizer)
+            optimize_W(X, W, H, C, mu, b1, b2, lam, optimizer)
 
         else:
 
-            optimization_step(X_tf, W, H, C, mu, b1, b2, lamW, lamH, W_lr, b_lr, optimizer)
-
-        loss = obj_fun(X_tf, W, H, C, mu, b1, b2, lamW, lamH, W_lr, b_lr)
+            optimization_step(X, W, H, C, mu, b1, b2, lam, W_lr, b_lr, optimizer)
 
         step = step + 1
 
         if step % 50 == 0:
-            print("epoch: %i, loss: %f" % (step, loss))
+
+            print("epoch: %i, mf_loss: %f, conf_loss: %f" % (step, mf_loss, conf_loss))
 
         if step == max_iter:
             print("Increase max_iter: unable to meet convergence criteria")
@@ -134,20 +148,17 @@ def optimize(X, W, H, C, mu, b1, b2, lamW, lamH, W_lr, b_lr, optimizer, tol, max
 
 class MatrixFactorizationClassifier(BaseEstimator):
 
-    
     def __init__(self,
                  latent_dim=50,
                  C=1,
-                 lamW=0.0,
-                 lamH=0.0,
+                 lam=0.0,
                  tol=0.0001,
                  max_iter=500,
                  learning_rate=0.1,
                  method="mean"):
         self.latent_dim = latent_dim
         self.C = C
-        self.lamW = lamW
-        self.lamH = lamH
+        self.lam = lam
         self.tol = tol
         self.max_iter = max_iter
         self.learning_rate = learning_rate
@@ -161,10 +172,9 @@ class MatrixFactorizationClassifier(BaseEstimator):
         self.b1 = None
         self.b2 = None
 
-
     def fit(self, X, y):
         self.X_shape = np.shape(X)
-        
+
         self.C = tf.constant(1 - np.abs(X - np.expand_dims(y, axis=1)),
                              dtype=tf.dtypes.float32)
         # self.C[self.C>=0.5] = 1
@@ -175,27 +185,26 @@ class MatrixFactorizationClassifier(BaseEstimator):
         self.mu, self.b1, self.b2 = calculate_biases(X)
 
         optimize(X, self.W, self.H, self.C, self.mu, self.b1, self.b2,
-                 self.lamW, self.lamH, self.W_lr, self.b_lr, self.optimizer, 
+                 self.lam, self.W_lr, self.b_lr, self.optimizer,
                  self.tol, self.max_iter)
 
         return self
-
 
     def predict(self, X):
         self.X_shape = np.shape(X)
 
         self.W_predict, _, _, _ = define_variables(self.X_shape, self.latent_dim)
-        
+
         self.C_predict = lr_model(X, self.W_lr, self.b_lr)
-        
+
         self.mu, self.b1, self.b2_predict = calculate_biases(X)
-        
+
         # optimize(X, self.W_predict, self.H, self.C_predict, self.mu, self.b1, self.b2_predict,
         #          self.lamW, self.lamH, self.W_lr, self.b_lr, self.optimizer,
         #          self.tol, self.max_iter, partial=True)
-        
+
         self.X_predict = model(self.W_predict, self.H, self.mu, self.b1, self.b2_predict)
-        
+
         self.parameters = {"W": self.W,
                            "W_predict": self.W_predict,
                            "H": self.H,
@@ -203,15 +212,15 @@ class MatrixFactorizationClassifier(BaseEstimator):
                            "b1": self.b1,
                            "b2": self.b2,
                            "b2_predict": self.b2_predict}
-        
+
         if self.method == 'mean':
             self.X_predict = np.mean(self.X_predict, axis=1)
         elif self.method == 'median':
             self.X_predict = np.median(self.X_predict, axis=1)
-            
+
         self.X_predict = np.clip(self.X_predict,
-                            a_min=0,
-                            a_max=1)
+                                 a_min=0,
+                                 a_max=1)
 
         return self.X_predict
 
@@ -232,21 +241,20 @@ if __name__ == "__main__":
     X = X_train
 
     #
-    mf_model = MatrixFactorization(latent_dim = 1,
-                                    max_iter=200,
-                                    learning_rate=0.001,
-                                    tol=0.01,
-                                    lamW=0.0,
-                                    lamH=0.0)
+    mf_model = MatrixFactorization(latent_dim=1,
+                                   max_iter=200,
+                                   learning_rate=0.001,
+                                   tol=0.01,
+                                   lamW=0.0,
+                                   lamH=0.0)
 
     initializer = keras.initializers.RandomUniform(minval=0,
-                                                      maxval=1, 
-                                                      seed=None)
+                                                   maxval=1,
+                                                   seed=None)
 
     mf_model.fit(X, labels_train)
 
     X_predict_probs, parameters = mf_model.predict(X_test)
-
 
     X_predict = np.copy(X_predict_probs)
     X_predict = np.round(X_predict_probs)
@@ -261,14 +269,13 @@ if __name__ == "__main__":
     f1score_base = np.max(sklearn.metrics.f1_score(labels_test, X_predict_mean))
 
     f1score = np.max(sklearn.metrics.f1_score(labels_test, X_predict))
-    
+
     acc_base = sklearn.metrics.accuracy_score(labels_test, X_predict_mean)
 
     accscore = sklearn.metrics.accuracy_score(labels_test, X_predict)
 
     print("f1 base: ", f1score_base)
     print("f1: ", f1score)
-    
+
     print("acc base: ", acc_base)
     print("acc: ", accscore)
-

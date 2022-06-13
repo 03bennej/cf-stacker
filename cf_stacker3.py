@@ -211,8 +211,8 @@ class MatrixFactorizationClassifier(BaseEstimator):
         self.X_predict = np.clip(self.X_predict,
                             a_min=0,
                             a_max=1)
-        
-        return self.X_predict, self.parameters
+
+        return self.X_predict
 
 
 if __name__ == "__main__":

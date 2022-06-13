@@ -63,7 +63,9 @@ def optimize_H(X, W, H, C, mu, b1, b2, lamW, lamH, optimizer):
 
 def optimization_step(X, W, H, C, mu, b1, b2, lamW, lamH, optimizer):
     optimize_W(X, W, H, C, mu, b1, b2, lamW, lamH, optimizer)
+    optimize_W(X, W, H, C, mu, b1, b2, lamW, lamH, optimizer)
 
+    optimize_H(X, W, H, C, mu, b1, b2, lamW, lamH, optimizer)
     optimize_H(X, W, H, C, mu, b1, b2, lamW, lamH, optimizer)
 
 

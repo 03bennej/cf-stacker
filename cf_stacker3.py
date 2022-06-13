@@ -58,7 +58,6 @@ def define_variables(X_shape, latent_dim):
 
 
 def obj_fun(X_true, W, H, C, mu, b1, b2, lamW, lamH, W_lr, b_lr):
-    C = tf.constant(C, dtype=tf.dtypes.float32)
     X_pred = model(W, H, mu, b1, b2)
     C_pred = lr_model(X_true, W_lr, b_lr)
     wmse = tf.reduce_mean(tf.math.multiply(C_pred, tf.pow(X_true - X_pred, 2)))
@@ -165,7 +164,8 @@ class MatrixFactorizationClassifier(BaseEstimator):
     def fit(self, X, y):
         self.X_shape = np.shape(X)
         
-        self.C = 1 - np.abs(X - np.expand_dims(y, axis=1))
+        self.C = tf.constant(1 - np.abs(X - np.expand_dims(y, axis=1)),
+                             dtype=tf.dtypes.float32)
         # self.C[self.C>=0.5] = 1
         # self.C[self.C<0.5] = 0
 

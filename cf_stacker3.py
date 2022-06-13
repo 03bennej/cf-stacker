@@ -131,7 +131,7 @@ def optimize(X, W, H, C, mu, b1, b2, lamW, lamH, W_lr, b_lr, optimizer, tol, max
             break
 
 
-class MatrixFactorization(BaseEstimator):
+class MatrixFactorizationClassifier(BaseEstimator):
 
     
     def __init__(self,

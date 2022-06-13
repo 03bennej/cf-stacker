@@ -116,7 +116,7 @@ class MatrixFactorization(BaseEstimator):
         self.learning_rate = learning_rate
         self.optimizer = keras.optimizers.Adam(self.learning_rate)
         self.initializer = keras.initializers.RandomUniform(minval=0,
-                                                            maxval=1,
+                                                            maxval=0.01,
                                                             seed=None)
 
         self.X_shape = None

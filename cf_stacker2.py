@@ -18,7 +18,7 @@ from sklearn.linear_model import LogisticRegression, LinearRegression
 
 
 def model(W, H, mu, b1, b2):
-    return tf.linalg.matmul(W, H) + mu + b1 + b2
+    return tf.linalg.matmul(W, H) #+ mu + b1 + b2
 
 
 def calculate_biases(X):

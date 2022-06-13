@@ -208,9 +208,9 @@ class MatrixFactorizationClassifier(BaseEstimator):
         elif self.method == 'median':
             self.X_predict = np.median(self.X_predict, axis=1)
             
-        # self.X_predict = np.clip(self.X_predict,
-        #                     a_min=0,
-        #                     a_max=1)
+        self.X_predict = np.clip(self.X_predict,
+                            a_min=0,
+                            a_max=1)
         
         return self.X_predict, self.parameters
 

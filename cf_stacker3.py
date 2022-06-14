@@ -110,6 +110,7 @@ def optimization_step(X, W, H, C, mu, b1, b2, lam, W_lr, b_lr, optimizer):
     with tf.GradientTape() as tape:
         X_pred = model(W, H, mu, b1, b2)
         C_pred = lr_model(X, W_lr, b_lr)
+        C_pred_round = C_pred
         loss = wmse(X, X_pred, C_pred) + wmse(C, C_pred, weights=None) \
                + l2_reg(W, lam) + l2_reg(H, lam) + l2_reg(C, lam)
 

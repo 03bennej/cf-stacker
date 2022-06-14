@@ -68,34 +68,34 @@ def l2_reg(U, lam):
     return lam * (tf.reduce_mean(tf.pow(U, 2)))
 
 
-def optimize_W(X, W, H, C, mu, b1, b2, lam, optimizer):
-    with tf.GradientTape() as tape:
-        X_pred = model(W, H, mu, b1, b2)
-        loss = wmse(X, X_pred, C) + l2_reg(W, lam) + l2_reg(H, lam)
-
-    gradients = tape.gradient(loss, [W])
-
-    optimizer.apply_gradients(zip(gradients, [W]))
-
-
-def optimize_H(X, W, H, C, mu, b1, b2, lam, optimizer):
-    with tf.GradientTape() as tape:
-        X_pred = model(W, H, mu, b1, b2)
-        loss = wmse(X, X_pred, C) + l2_reg(W, lam) + l2_reg(H, lam)
-
-    gradients = tape.gradient(loss, [H])
-
-    optimizer.apply_gradients(zip(gradients, [H]))
+# def optimize_W(X, W, H, C, mu, b1, b2, lam, optimizer):
+#     with tf.GradientTape() as tape:
+#         X_pred = model(W, H, mu, b1, b2)
+#         loss = wmse(X, X_pred, C) + l2_reg(W, lam) + l2_reg(H, lam)
+#
+#     gradients = tape.gradient(loss, [W])
+#
+#     optimizer.apply_gradients(zip(gradients, [W]))
 
 
-def optimize_C(X, C, W_lr, b_lr, optimizer):
-    with tf.GradientTape() as tape:
-        C_pred = lr_model(X, W_lr, b_lr)
-        loss = wmse(C, C_pred, weights=None)
+# def optimize_H(X, W, H, C, mu, b1, b2, lam, optimizer):
+#     with tf.GradientTape() as tape:
+#         X_pred = model(W, H, mu, b1, b2)
+#         loss = wmse(X, X_pred, C) + l2_reg(W, lam) + l2_reg(H, lam)
+#
+#     gradients = tape.gradient(loss, [H])
+#
+#     optimizer.apply_gradients(zip(gradients, [H]))
 
-    gradients = tape.gradient(loss, [W_lr, b_lr])
 
-    optimizer.apply_gradients(zip(gradients, [W_lr, b_lr]))
+# def optimize_C(X, C, W_lr, b_lr, optimizer):
+#     with tf.GradientTape() as tape:
+#         C_pred = lr_model(X, W_lr, b_lr)
+#         loss = wmse(C, C_pred, weights=None)
+#
+#     gradients = tape.gradient(loss, [W_lr, b_lr])
+#
+#     optimizer.apply_gradients(zip(gradients, [W_lr, b_lr]))
 
 
 # def optimization_step(X, W, H, C, mu, b1, b2, lam, W_lr, b_lr, optimizer):
@@ -115,7 +115,7 @@ def optimization_step(X, W, H, C, mu, b1, b2, lam, W_lr, b_lr, optimizer):
     gradients = tape.gradient(loss, [W, H, W_lr, b_lr])
     optimizer.apply_gradients(zip(gradients, [W, H, W_lr, b_lr]))
 
-def optimizationW(X, W, H, C, mu, b1, b2, lam, W_lr, b_lr, optimizer):
+def optimize_W(X, W, H, C, mu, b1, b2, lam, W_lr, b_lr, optimizer):
     with tf.GradientTape() as tape:
         X_pred = model(W, H, mu, b1, b2)
         C_pred = lr_model(X, W_lr, b_lr)

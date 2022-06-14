@@ -18,7 +18,7 @@ from sklearn.linear_model import LogisticRegression, LinearRegression
 
 
 def model(W, H, mu, b1, b2):
-    return tf.linalg.matmul(W, H) #+ mu + b1 + b2
+    return tf.linalg.matmul(W, H) + mu + b1 + b2
 
 
 def lr_model(X, W_lr, b_lr):
@@ -115,38 +115,42 @@ def optimization_step(X, W, H, C, mu, b1, b2, lam, W_lr, b_lr, optimizer):
     gradients = tape.gradient(loss, [W, H, W_lr, b_lr])
     optimizer.apply_gradients(zip(gradients, [W, H, W_lr, b_lr]))
 
-def optimize_W(X, W, H, C, mu, b1, b2, lam, W_lr, b_lr, optimizer):
+def optimize_W(X, W, H, mu, b1, b2, lam, W_lr, b_lr, optimizer):
     with tf.GradientTape() as tape:
         X_pred = model(W, H, mu, b1, b2)
         C_pred = lr_model(X, W_lr, b_lr)
-        loss = wmse(X, X_pred, C_pred) + wmse(C, C_pred, weights=None) + l2_reg(W, lam) + l2_reg(H, lam)
+        loss = wmse(X, X_pred, C_pred) + l2_reg(W, lam) + l2_reg(H, lam)
 
     gradients = tape.gradient(loss, [W])
     optimizer.apply_gradients(zip(gradients, [W]))
 
-def optimize(X, W, H, C, mu, b1, b2, lam, W_lr, b_lr, optimizer, tol, max_iter,
-             partial=False):
+def optimize(X, W, H, mu, b1, b2, lam, W_lr, b_lr, optimizer, tol, max_iter,
+             train=False, C=None):
     step = 0
 
     X_tf = tf.constant(X, dtype=tf.dtypes.float32)
-    C_tf = tf.constant(C, dtype=tf.dtypes.float32)
 
     X_pred = model(W, H, mu, b1, b2)
     C_pred = lr_model(X_tf, W_lr, b_lr)
     mf_loss = wmse(X_tf, X_pred, C_pred) + l2_reg(W, lam) + l2_reg(H, lam)
-    conf_loss = wmse(C_tf, C_pred, weights=None)
+
+    if train:
+        C_tf = tf.constant(C, dtype=tf.dtypes.float32)
+        conf_loss = wmse(C_tf, C_pred, weights=None)
+    else:
+        conf_loss = 0
 
     tot_loss = mf_loss + conf_loss
 
     while tot_loss > tol:
 
-        if partial:
+        if train:
 
-            optimize_W(X_tf, W, H, C_tf, mu, b1, b2, lam, W_lr, b_lr, optimizer)
+            optimization_step(X_tf, W, H, C_tf, mu, b1, b2, lam, W_lr, b_lr, optimizer)
 
         else:
 
-            optimization_step(X_tf, W, H, C_tf, mu, b1, b2, lam, W_lr, b_lr, optimizer)
+            optimize_W(X_tf, W, H, mu, b1, b2, lam, W_lr, b_lr, optimizer)
 
         step = step + 1
 
@@ -154,11 +158,13 @@ def optimize(X, W, H, C, mu, b1, b2, lam, W_lr, b_lr, optimizer, tol, max_iter,
             X_pred = model(W, H, mu, b1, b2)
             C_pred = lr_model(X_tf, W_lr, b_lr)
             mf_loss = wmse(X_tf, X_pred, C_pred) + l2_reg(W, lam) + l2_reg(H, lam)
-            conf_loss = wmse(C_tf, C_pred, weights=None)
-
-            tot_loss = mf_loss + conf_loss
-
-            print("epoch: %i, tot_loss: %f, mf_loss: %f, conf_loss: %f" % (step, tot_loss, mf_loss, conf_loss))
+            if train:
+                C_tf = tf.constant(C, dtype=tf.dtypes.float32)
+                conf_loss = wmse(C_tf, C_pred, weights=None)
+                tot_loss = mf_loss + conf_loss
+                print("epoch: %i, tot_loss: %f, mf_loss: %f, conf_loss: %f" % (step, tot_loss, mf_loss, conf_loss))
+            else:
+                print("epoch: %i, mf_loss: %f" % (step, mf_loss))
 
         if step == max_iter:
             print("Increase max_iter: unable to meet convergence criteria")
@@ -203,9 +209,9 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
         self.mu, self.b1, self.b2 = calculate_biases(X)
 
-        optimize(X, self.W, self.H, self.C, self.mu, self.b1, self.b2,
+        optimize(X, self.W, self.H, self.mu, self.b1, self.b2,
                  self.lam, self.W_lr, self.b_lr, self.optimizer,
-                 self.tol, self.max_iter)
+                 self.tol, self.max_iter, train=True, C=self.C)
 
         return self
 
@@ -218,9 +224,9 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
         self.mu, self.b1, self.b2_predict = calculate_biases(X)
 
-        optimize(X, self.W_predict, self.H, self.C_predict, self.mu, self.b1, self.b2_predict,
+        optimize(X, self.W_predict, self.H, self.mu, self.b1, self.b2_predict,
                  self.lam, self.W_lr, self.b_lr, self.optimizer,
-                 self.tol, self.max_iter, partial=True)
+                 self.tol, self.max_iter)
 
         self.X_predict = model(self.W_predict, self.H, self.mu, self.b1, self.b2_predict)
 
@@ -258,14 +264,18 @@ if __name__ == "__main__":
     y_test = 1 - np.abs(X_test - np.expand_dims(labels_test, axis=1))
 
     X = X_train
+    
+    C_train = tf.constant(y_train,
+                          dtype=tf.dtypes.float32)
+    C_test = tf.constant(y_test,
+                          dtype=tf.dtypes.float32)
 
     #
-    mf_model = MatrixFactorization(latent_dim=1,
+    mf_model = MatrixFactorizationClassifier(latent_dim=10,
                                    max_iter=200,
                                    learning_rate=0.001,
                                    tol=0.01,
-                                   lamW=0.0,
-                                   lamH=0.0)
+                                   lam=0.0)
 
     initializer = keras.initializers.RandomUniform(minval=0,
                                                    maxval=1,
@@ -273,7 +283,7 @@ if __name__ == "__main__":
 
     mf_model.fit(X, labels_train)
 
-    X_predict_probs, parameters = mf_model.predict(X_test)
+    X_predict_probs = mf_model.predict(X_test)
 
     X_predict = np.copy(X_predict_probs)
     X_predict = np.round(X_predict_probs)

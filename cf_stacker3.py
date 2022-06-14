@@ -132,7 +132,7 @@ def optimize(X, W, H, C, mu, b1, b2, lam, W_lr, b_lr, optimizer, tol, max_iter,
 
         step = step + 1
 
-        if step % 50 == 0:
+        if step % 5 == 0:
             X_pred = model(W, H, mu, b1, b2)
             C_pred = lr_model(X_tf, W_lr, b_lr)
             mf_loss = wmse(X_tf, X_pred, C_pred) + l2_reg(W, lam) + l2_reg(H, lam)

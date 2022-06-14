@@ -115,6 +115,15 @@ def optimization_step(X, W, H, C, mu, b1, b2, lam, W_lr, b_lr, optimizer):
     gradients = tape.gradient(loss, [W, H, W_lr, b_lr])
     optimizer.apply_gradients(zip(gradients, [W, H, W_lr, b_lr]))
 
+def optimizationW(X, W, H, C, mu, b1, b2, lam, W_lr, b_lr, optimizer):
+    with tf.GradientTape() as tape:
+        X_pred = model(W, H, mu, b1, b2)
+        C_pred = lr_model(X, W_lr, b_lr)
+        loss = wmse(X, X_pred, C_pred) + wmse(C, C_pred, weights=None) + l2_reg(W, lam) + l2_reg(H, lam)
+
+    gradients = tape.gradient(loss, [W])
+    optimizer.apply_gradients(zip(gradients, [W]))
+
 def optimize(X, W, H, C, mu, b1, b2, lam, W_lr, b_lr, optimizer, tol, max_iter,
              partial=False):
     step = 0

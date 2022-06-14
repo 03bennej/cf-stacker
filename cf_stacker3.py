@@ -68,12 +68,6 @@ def l2_reg(U, lam):
     return lam * (tf.reduce_mean(tf.pow(U, 2)))
 
 
-# def obj_fun(X_true, W, H, C, mu, b1, b2, lam, W_lr, b_lr):
-#     mat_loss = matrix_completion_loss(X_true, W, H, C, mu, b1, b2, lam)
-#     conf_loss = confidence_loss(X_true, C_true, W_lr, b_lr)
-#     return mat_loss + conf_loss
-
-
 def optimize_W(X, W, H, C, mu, b1, b2, lam, optimizer):
     with tf.GradientTape() as tape:
         X_pred = model(W, H, mu, b1, b2)
@@ -200,9 +194,9 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
         self.mu, self.b1, self.b2_predict = calculate_biases(X)
 
-        # optimize(X, self.W_predict, self.H, self.C_predict, self.mu, self.b1, self.b2_predict,
-        #          self.lamW, self.lamH, self.W_lr, self.b_lr, self.optimizer,
-        #          self.tol, self.max_iter, partial=True)
+        optimize(X, self.W_predict, self.H, self.C_predict, self.mu, self.b1, self.b2_predict,
+                 self.lamW, self.lamH, self.W_lr, self.b_lr, self.optimizer,
+                 self.tol, self.max_iter, partial=True)
 
         self.X_predict = model(self.W_predict, self.H, self.mu, self.b1, self.b2_predict)
 

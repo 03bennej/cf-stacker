@@ -117,11 +117,12 @@ def optimize(X, W, H, C, mu, b1, b2, lam, W_lr, b_lr, optimizer, tol, max_iter,
     step = 0
 
     X_tf = tf.constant(X, dtype=tf.dtypes.float32)
+    C_tf = tf.constant(C, dtype=tf.dtypes.float32)
 
     X_pred = model(W, H, mu, b1, b2)
-    C_pred = lr_model(X, W_lr, b_lr)
-    mf_loss = wmse(X, X_pred, C_pred) + l2_reg(W, lam) + l2_reg(H, lam)
-    conf_loss = wmse(C, C_pred, weights=None)
+    C_pred = lr_model(X_tf, W_lr, b_lr)
+    mf_loss = wmse(X_tf, X_pred, C_pred) + l2_reg(W, lam) + l2_reg(H, lam)
+    conf_loss = wmse(C_tf, C_pred, weights=None)
 
     tot_loss = mf_loss + conf_loss
 
@@ -129,11 +130,11 @@ def optimize(X, W, H, C, mu, b1, b2, lam, W_lr, b_lr, optimizer, tol, max_iter,
 
         if partial:
 
-            optimize_W(X, W, H, C, mu, b1, b2, lam, optimizer)
+            optimize_W(X_tf, W, H, C_tf, mu, b1, b2, lam, optimizer)
 
         else:
 
-            optimization_step(X, W, H, C, mu, b1, b2, lam, W_lr, b_lr, optimizer)
+            optimization_step(X_tf, W, H, C_tf, mu, b1, b2, lam, W_lr, b_lr, optimizer)
 
         step = step + 1
 

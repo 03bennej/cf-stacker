@@ -142,7 +142,7 @@ def optimize(X, W, H, C, mu, b1, b2, lam, W_lr, b_lr, optimizer, tol, max_iter,
 
         if partial:
 
-            optimize_W(X_tf, W, H, C_tf, mu, b1, b2, lam, optimizer)
+            optimize_W(X_tf, W, H, C_tf, mu, b1, b2, lam, W_lr, b_lr, optimizer)
 
         else:
 

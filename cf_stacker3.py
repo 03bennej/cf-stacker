@@ -110,7 +110,8 @@ def optimization_step(X, W, H, C, mu, b1, b2, lam, W_lr, b_lr, optimizer):
     with tf.GradientTape() as tape:
         X_pred = model(W, H, mu, b1, b2)
         C_pred = lr_model(X, W_lr, b_lr)
-        loss = wmse(X, X_pred, C_pred) + wmse(C, C_pred, weights=None) + l2_reg(W, lam) + l2_reg(H, lam)
+        loss = wmse(X, X_pred, C_pred) + wmse(C, C_pred, weights=None) \
+               + l2_reg(W, lam) + l2_reg(H, lam) + l2_reg(C, lam)
 
     gradients = tape.gradient(loss, [W, H, W_lr, b_lr])
     optimizer.apply_gradients(zip(gradients, [W, H, W_lr, b_lr]))
@@ -136,7 +137,7 @@ def optimize(X, W, H, mu, b1, b2, lam, W_lr, b_lr, optimizer, tol, max_iter,
 
     if train:
         C_tf = tf.constant(C, dtype=tf.dtypes.float32)
-        conf_loss = wmse(C_tf, C_pred, weights=None)
+        conf_loss = wmse(C_tf, C_pred, weights=None) + l2_reg(C_tf, lam)
     else:
         conf_loss = 0
 
@@ -160,7 +161,7 @@ def optimize(X, W, H, mu, b1, b2, lam, W_lr, b_lr, optimizer, tol, max_iter,
             mf_loss = wmse(X_tf, X_pred, C_pred) + l2_reg(W, lam) + l2_reg(H, lam)
             if train:
                 C_tf = tf.constant(C, dtype=tf.dtypes.float32)
-                conf_loss = wmse(C_tf, C_pred, weights=None)
+                conf_loss = wmse(C_tf, C_pred, weights=None) + l2_reg(C_tf, lam)
                 tot_loss = mf_loss + conf_loss
                 print("epoch: %i, tot_loss: %f, mf_loss: %f, conf_loss: %f" % (step, tot_loss, mf_loss, conf_loss))
             else:

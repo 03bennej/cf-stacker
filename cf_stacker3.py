@@ -99,11 +99,11 @@ def optimize_C(X, C, W_lr, b_lr, optimizer):
 
 
 def optimization_step(X, W, H, C, mu, b1, b2, lam, W_lr, b_lr, optimizer):
-    optimize_W(X, W, H, C, mu, b1, b2, lam, optimizer)
+    #optimize_W(X, W, H, C, mu, b1, b2, lam, optimizer)
 
-    optimize_H(X, W, H, C, mu, b1, b2, lam, optimizer)
+    #optimize_H(X, W, H, C, mu, b1, b2, lam, optimizer)
 
-    #optimize_C(X, C, W_lr, b_lr, optimizer)
+    optimize_C(X, C, W_lr, b_lr, optimizer)
 
 
 def optimize(X, W, H, C, mu, b1, b2, lam, W_lr, b_lr, optimizer, tol, max_iter,

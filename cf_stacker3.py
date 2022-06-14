@@ -98,13 +98,22 @@ def optimize_C(X, C, W_lr, b_lr, optimizer):
     optimizer.apply_gradients(zip(gradients, [W_lr, b_lr]))
 
 
+# def optimization_step(X, W, H, C, mu, b1, b2, lam, W_lr, b_lr, optimizer):
+#     #optimize_W(X, W, H, C, mu, b1, b2, lam, optimizer)
+#
+#     #optimize_H(X, W, H, C, mu, b1, b2, lam, optimizer)
+#
+#     optimize_C(X, C, W_lr, b_lr, optimizer)
+
+
 def optimization_step(X, W, H, C, mu, b1, b2, lam, W_lr, b_lr, optimizer):
-    #optimize_W(X, W, H, C, mu, b1, b2, lam, optimizer)
+    with tf.GradientTape() as tape:
+        X_pred = model(W, H, mu, b1, b2)
+        C_pred = lr_model(X, W_lr, b_lr)
+        loss = wmse(X, X_pred, C) + wmse(C, C_pred, weights=None) + l2_reg(W, lam) + l2_reg(H, lam)
 
-    #optimize_H(X, W, H, C, mu, b1, b2, lam, optimizer)
-
-    optimize_C(X, C, W_lr, b_lr, optimizer)
-
+    gradients = tape.gradient(loss, [W, H, W_lr, b_lr])
+    optimizer.apply_gradients(zip(gradients, [W, H, W_lr, b_lr]))
 
 def optimize(X, W, H, C, mu, b1, b2, lam, W_lr, b_lr, optimizer, tol, max_iter,
              partial=False):

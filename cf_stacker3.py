@@ -110,7 +110,6 @@ def optimization_step(X, W, H, C, mu, b1, b2, lam, W_lr, b_lr, optimizer):
     with tf.GradientTape() as tape:
         X_pred = model(W, H, mu, b1, b2)
         C_pred = lr_model(X, W_lr, b_lr)
-        C_pred_round = C_pred
         loss = wmse(X, X_pred, C_pred) + wmse(C, C_pred, weights=None) \
                + l2_reg(W, lam) + l2_reg(H, lam) + l2_reg(C, lam)
 
@@ -204,10 +203,10 @@ class MatrixFactorizationClassifier(BaseEstimator):
     def fit(self, X, y):
         self.X_shape = np.shape(X)
 
-        self.C = tf.constant(1 - np.abs(X - np.expand_dims(y, axis=1)),
-                             dtype=tf.dtypes.float32)
-        # self.C[self.C>=0.5] = 1
-        # self.C[self.C<0.5] = 0
+        self.C = 1 - np.abs(X - np.expand_dims(y, axis=1))
+        self.C[self.C >= 0.5] = 1
+        self.C[self.C < 0.5] = 0
+        self.C = tf.constant(self.C, dtype=tf.dtypes.float32)
 
         self.W, self.H, self.W_lr, self.b_lr = define_variables(self.X_shape, self.latent_dim)
 

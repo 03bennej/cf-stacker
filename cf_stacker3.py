@@ -23,7 +23,7 @@ def model(W, H, mu, b1, b2):
 
 def lr_model(X, W_lr, b_lr):
     X_tf = tf.constant(X, dtype=tf.dtypes.float32)
-    return tf.sigmoid(tf.add(tf.matmul(X_tf, W_lr), b_lr))
+    return tf.nn.softmax(tf.add(tf.matmul(X_tf, W_lr), b_lr))
 
 
 def calculate_biases(X):

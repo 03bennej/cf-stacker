@@ -195,7 +195,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
         self.mu, self.b1, self.b2_predict = calculate_biases(X)
 
         optimize(X, self.W_predict, self.H, self.C_predict, self.mu, self.b1, self.b2_predict,
-                 self.lamW, self.lamH, self.W_lr, self.b_lr, self.optimizer,
+                 self.lam, self.W_lr, self.b_lr, self.optimizer,
                  self.tol, self.max_iter, partial=True)
 
         self.X_predict = model(self.W_predict, self.H, self.mu, self.b1, self.b2_predict)

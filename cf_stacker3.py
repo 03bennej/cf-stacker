@@ -110,11 +110,12 @@ def optimization_step(X, W, H, C, mu, b1, b2, lam, W_lr, b_lr, optimizer):
     with tf.GradientTape() as tape:
         X_pred = model(W, H, mu, b1, b2)
         C_pred = lr_model(X, W_lr, b_lr)
-        loss = wmse(X, X_pred, C_pred) + wmse(C, C_pred, weights=None) \
+        loss = wmse(X, X_pred, C_pred ** 2) + wmse(C, C_pred, weights=None) \
                + l2_reg(W, lam) + l2_reg(H, lam) + l2_reg(C, lam)
 
     gradients = tape.gradient(loss, [W, H, W_lr, b_lr])
     optimizer.apply_gradients(zip(gradients, [W, H, W_lr, b_lr]))
+
 
 def optimize_W(X, W, H, mu, b1, b2, lam, W_lr, b_lr, optimizer):
     with tf.GradientTape() as tape:
@@ -124,6 +125,7 @@ def optimize_W(X, W, H, mu, b1, b2, lam, W_lr, b_lr, optimizer):
 
     gradients = tape.gradient(loss, [W])
     optimizer.apply_gradients(zip(gradients, [W]))
+
 
 def optimize(X, W, H, mu, b1, b2, lam, W_lr, b_lr, optimizer, tol, max_iter,
              train=False, C=None):
@@ -265,18 +267,18 @@ if __name__ == "__main__":
     y_test = 1 - np.abs(X_test - np.expand_dims(labels_test, axis=1))
 
     X = X_train
-    
+
     C_train = tf.constant(y_train,
                           dtype=tf.dtypes.float32)
     C_test = tf.constant(y_test,
-                          dtype=tf.dtypes.float32)
+                         dtype=tf.dtypes.float32)
 
     #
     mf_model = MatrixFactorizationClassifier(latent_dim=10,
-                                   max_iter=200,
-                                   learning_rate=0.001,
-                                   tol=0.01,
-                                   lam=0.0)
+                                             max_iter=200,
+                                             learning_rate=0.001,
+                                             tol=0.01,
+                                             lam=0.0)
 
     initializer = keras.initializers.RandomUniform(minval=0,
                                                    maxval=1,

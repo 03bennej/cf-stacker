@@ -23,7 +23,7 @@ def model(W, H, mu, b1, b2):
 
 def lr_model(X, W_lr, b_lr):
     X_tf = tf.constant(X, dtype=tf.dtypes.float32)
-    return tf.nn.softmax(tf.add(tf.matmul(X_tf, W_lr), b_lr))
+    return tf.math.sigmoid(tf.add(tf.matmul(X_tf, W_lr), b_lr))
 
 
 def calculate_biases(X):
@@ -48,7 +48,7 @@ def define_variables(X_shape, latent_dim):
     H = tf.Variable(initializer(shape=[latent_dim, X2],
                                 dtype=tf.dtypes.float32),
                     trainable=True)
-    W_lr = tf.Variable(initializer(shape=[X2, X2],
+    W_lr = tf.Variable(initializer(shape=[X2, 1],
                                    dtype=tf.dtypes.float32),
                        trainable=True)
     b_lr = tf.Variable(initializer(shape=[1, X2],
@@ -64,67 +64,75 @@ def wmse(X_true, X_pred, weights=None):
         return tf.reduce_mean(tf.math.multiply(weights, tf.pow(X_true - X_pred, 2)))
 
 
+def cross_entropy_loss(X_true, X_pred, class_ratio=0.5):
+    return class_ratio * tf.reduce_mean(-(tf.math.multiply(X_true, tf.math.log(X_pred)) 
+             + (1-class_ratio) * tf.math.multiply(1 - X_true, tf.math.log(1-X_pred))))
+
+
 def l2_reg(U, lam):
     return lam * (tf.reduce_mean(tf.pow(U, 2)))
 
 
-# def optimize_W(X, W, H, C, mu, b1, b2, lam, optimizer):
-#     with tf.GradientTape() as tape:
-#         X_pred = model(W, H, mu, b1, b2)
-#         loss = wmse(X, X_pred, C) + l2_reg(W, lam) + l2_reg(H, lam)
-#
-#     gradients = tape.gradient(loss, [W])
-#
-#     optimizer.apply_gradients(zip(gradients, [W]))
+def optimize_W(X, W, H, C, mu, b1, b2, lam, optimizer):
+    with tf.GradientTape() as tape:
+        X_pred = model(W, H, mu, b1, b2)
+        loss = wmse(X, X_pred, C) + l2_reg(W, lam) + l2_reg(H, lam)
+
+    gradients = tape.gradient(loss, [W])
+
+    optimizer.apply_gradients(zip(gradients, [W]))
 
 
-# def optimize_H(X, W, H, C, mu, b1, b2, lam, optimizer):
-#     with tf.GradientTape() as tape:
-#         X_pred = model(W, H, mu, b1, b2)
-#         loss = wmse(X, X_pred, C) + l2_reg(W, lam) + l2_reg(H, lam)
-#
-#     gradients = tape.gradient(loss, [H])
-#
-#     optimizer.apply_gradients(zip(gradients, [H]))
+def optimize_H(X, W, H, C, mu, b1, b2, lam, optimizer):
+    with tf.GradientTape() as tape:
+        X_pred = model(W, H, mu, b1, b2)
+        loss = wmse(X, X_pred, C) + l2_reg(W, lam) + l2_reg(H, lam)
+
+    gradients = tape.gradient(loss, [H])
+
+    optimizer.apply_gradients(zip(gradients, [H]))
 
 
-# def optimize_C(X, C, W_lr, b_lr, optimizer):
-#     with tf.GradientTape() as tape:
-#         C_pred = lr_model(X, W_lr, b_lr)
-#         loss = wmse(C, C_pred, weights=None)
-#
-#     gradients = tape.gradient(loss, [W_lr, b_lr])
-#
-#     optimizer.apply_gradients(zip(gradients, [W_lr, b_lr]))
+def optimize_C(X, C, W_lr, b_lr, optimizer):
+    with tf.GradientTape() as tape:
+        C_pred = lr_model(X, W_lr, b_lr)
+        loss = cross_entropy_loss(C, C_pred)
 
+    gradients = tape.gradient(loss, [W_lr, b_lr])
 
-# def optimization_step(X, W, H, C, mu, b1, b2, lam, W_lr, b_lr, optimizer):
-#     #optimize_W(X, W, H, C, mu, b1, b2, lam, optimizer)
-#
-#     #optimize_H(X, W, H, C, mu, b1, b2, lam, optimizer)
-#
-#     optimize_C(X, C, W_lr, b_lr, optimizer)
+    optimizer.apply_gradients(zip(gradients, [W_lr, b_lr]))
 
 
 def optimization_step(X, W, H, C, mu, b1, b2, lam, W_lr, b_lr, optimizer):
-    with tf.GradientTape() as tape:
-        X_pred = model(W, H, mu, b1, b2)
-        C_pred = lr_model(X, W_lr, b_lr)
-        loss = wmse(X, X_pred, C_pred) + wmse(C, C_pred, weights=None) \
-               + l2_reg(W, lam) + l2_reg(H, lam) + l2_reg(C, lam)
+    optimize_W(X, W, H, C, mu, b1, b2, lam, optimizer)
 
-    gradients = tape.gradient(loss, [W, H, W_lr, b_lr])
-    optimizer.apply_gradients(zip(gradients, [W, H, W_lr, b_lr]))
+    optimize_H(X, W, H, C, mu, b1, b2, lam, optimizer)
+
+    optimize_C(X, C, W_lr, b_lr, optimizer)
 
 
-def optimize_W(X, W, H, mu, b1, b2, lam, W_lr, b_lr, optimizer):
-    with tf.GradientTape() as tape:
-        X_pred = model(W, H, mu, b1, b2)
-        C_pred = lr_model(X, W_lr, b_lr)
-        loss = wmse(X, X_pred, C_pred) + l2_reg(W, lam) + l2_reg(H, lam)
+# def optimization_step(X, W, H, C, mu, b1, b2, lam, W_lr, b_lr, optimizer):
+#     with tf.GradientTape() as tape:
+#         X_pred = model(W, H, mu, b1, b2)
+#         C_pred = lr_model(X, W_lr, b_lr)
+#         loss = wmse(X, X_pred, C_pred) + cross_entropy_loss(C, C_pred) \
+#                + l2_reg(W, lam) + l2_reg(H, lam) + l2_reg(C, lam)
 
-    gradients = tape.gradient(loss, [W])
-    optimizer.apply_gradients(zip(gradients, [W]))
+#     gradients = tape.gradient(loss, [W, H, W_lr, b_lr])
+#     optimizer.apply_gradients(zip(gradients, [W, H, W_lr, b_lr]))
+
+
+# def optimize_W(X, W, H, mu, b1, b2, lam, W_lr, b_lr, optimizer):
+#     with tf.GradientTape() as tape:
+#         X_pred = model(W, H, mu, b1, b2)
+#         C_pred = lr_model(X, W_lr, b_lr)
+#         loss = wmse(X, X_pred, C_pred) + l2_reg(W, lam) + l2_reg(H, lam)
+
+#     gradients = tape.gradient(loss, [W])
+#     optimizer.apply_gradients(zip(gradients, [W]))
+
+
+# def o
 
 
 def optimize(X, W, H, mu, b1, b2, lam, W_lr, b_lr, optimizer, tol, max_iter,
@@ -139,7 +147,7 @@ def optimize(X, W, H, mu, b1, b2, lam, W_lr, b_lr, optimizer, tol, max_iter,
 
     if train:
         C_tf = tf.constant(C, dtype=tf.dtypes.float32)
-        conf_loss = wmse(C_tf, C_pred, weights=None) + l2_reg(C_tf, lam)
+        conf_loss = cross_entropy_loss(C_tf, C_pred) + l2_reg(C_tf, lam)
     else:
         conf_loss = 0
 
@@ -153,17 +161,17 @@ def optimize(X, W, H, mu, b1, b2, lam, W_lr, b_lr, optimizer, tol, max_iter,
 
         else:
 
-            optimize_W(X_tf, W, H, mu, b1, b2, lam, W_lr, b_lr, optimizer)
+            optimize_W(X_tf, W, H, C_pred, mu, b1, b2, lam, optimizer)
 
         step = step + 1
 
-        if step % 50 == 0:
+        if step % 1 == 0:
             X_pred = model(W, H, mu, b1, b2)
             C_pred = lr_model(X_tf, W_lr, b_lr)
             mf_loss = wmse(X_tf, X_pred, C_pred) + l2_reg(W, lam) + l2_reg(H, lam)
             if train:
                 C_tf = tf.constant(C, dtype=tf.dtypes.float32)
-                conf_loss = wmse(C_tf, C_pred, weights=None) + l2_reg(C_tf, lam)
+                conf_loss = cross_entropy_loss(C_tf, C_pred) + l2_reg(C_tf, lam)
                 tot_loss = mf_loss + conf_loss
                 print("epoch: %i, tot_loss: %f, mf_loss: %f, conf_loss: %f" % (step, tot_loss, mf_loss, conf_loss))
             else:
@@ -268,15 +276,15 @@ if __name__ == "__main__":
 
     X = X_train
 
-    C_train = tf.constant(y_train,
-                          dtype=tf.dtypes.float32)
-    C_test = tf.constant(y_test,
-                         dtype=tf.dtypes.float32)
+    # C_train = tf.constant(y_train,
+    #                       dtype=tf.dtypes.float32)
+    # C_test = tf.constant(y_test,
+    #                      dtype=tf.dtypes.float32)
 
     #
     mf_model = MatrixFactorizationClassifier(latent_dim=10,
-                                             max_iter=200,
-                                             learning_rate=0.001,
+                                             max_iter=100,
+                                             learning_rate=0.01,
                                              tol=0.01,
                                              lam=0.0)
 
@@ -311,3 +319,10 @@ if __name__ == "__main__":
 
     print("acc base: ", acc_base)
     print("acc: ", accscore)
+    
+    C_predict = np.round(mf_model.C_predict)
+    C_test = 1 - np.abs(X_test - np.expand_dims(labels_test, axis=1))
+    C_test[C_test >= 0.5] = 1
+    C_test[C_test < 0.5] = 0
+    
+    print("C accuracy", sklearn.metrics.accuracy_score(C_test, C_predict))

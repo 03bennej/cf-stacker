@@ -282,7 +282,7 @@ if __name__ == "__main__":
     #                      dtype=tf.dtypes.float32)
 
     #
-    mf_model = MatrixFactorizationClassifier(latent_dim=10,
+    mf_model = MatrixFactorizationClassifier(latent_dim=15,
                                              max_iter=5000,
                                              learning_rate=0.01,
                                              tol=0.01,

@@ -48,7 +48,7 @@ def define_variables(X_shape, latent_dim):
     H = tf.Variable(initializer(shape=[latent_dim, X2],
                                 dtype=tf.dtypes.float32),
                     trainable=True)
-    W_lr = tf.Variable(initializer(shape=[X2, 1],
+    W_lr = tf.Variable(initializer(shape=[X2, X2],
                                    dtype=tf.dtypes.float32),
                        trainable=True)
     b_lr = tf.Variable(initializer(shape=[1, X2],
@@ -165,7 +165,7 @@ def optimize(X, W, H, mu, b1, b2, lam, W_lr, b_lr, optimizer, tol, max_iter,
 
         step = step + 1
 
-        if step % 1 == 0:
+        if step % 50 == 0:
             X_pred = model(W, H, mu, b1, b2)
             C_pred = lr_model(X_tf, W_lr, b_lr)
             mf_loss = wmse(X_tf, X_pred, C_pred) + l2_reg(W, lam) + l2_reg(H, lam)
@@ -283,7 +283,7 @@ if __name__ == "__main__":
 
     #
     mf_model = MatrixFactorizationClassifier(latent_dim=10,
-                                             max_iter=100,
+                                             max_iter=5000,
                                              learning_rate=0.01,
                                              tol=0.01,
                                              lam=0.0)
@@ -326,3 +326,15 @@ if __name__ == "__main__":
     C_test[C_test < 0.5] = 0
     
     print("C accuracy", sklearn.metrics.accuracy_score(C_test, C_predict))
+    
+    C_train = 1 - np.abs(X_train - np.expand_dims(labels_train, axis=1))
+    C_train[C_train >= 0.5] = 1
+    C_train[C_train < 0.5] = 0
+    
+    Cmodel_sk = MultiOutputRegressor(estimator=LogisticRegression())
+    
+    Cmodel_sk.fit(X_train, C_train)
+    
+    Cmodel_pred = Cmodel_sk.predict(X_test) 
+    
+    print("C accuracy", sklearn.metrics.accuracy_score(C_test, Cmodel_pred))

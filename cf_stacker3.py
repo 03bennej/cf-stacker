@@ -165,21 +165,21 @@ def optimize(X, W, H, mu, b1, b2, lam, W_lr, b_lr, optimizer, tol, max_iter,
 
         step = step + 1
 
-        # if step % 50 == 0:
-        #     X_pred = model(W, H, mu, b1, b2)
-        #     C_pred = lr_model(X_tf, W_lr, b_lr)
-        #     mf_loss = wmse(X_tf, X_pred, C_pred) + l2_reg(W, lam) + l2_reg(H, lam)
-        #     if train:
-        #         C_tf = tf.constant(C, dtype=tf.dtypes.float32)
-        #         conf_loss = cross_entropy_loss(C_tf, C_pred) + l2_reg(C_tf, lam)
-        #         tot_loss = mf_loss + conf_loss
-        #         print("epoch: %i, tot_loss: %f, mf_loss: %f, conf_loss: %f" % (step, tot_loss, mf_loss, conf_loss))
-        #     else:
-        #         print("epoch: %i, mf_loss: %f" % (step, mf_loss))
-        #
-        # if step == max_iter:
-        #     print("Increase max_iter: unable to meet convergence criteria")
-        #     break
+        if step % 100 == 0:
+            X_pred = model(W, H, mu, b1, b2)
+            C_pred = lr_model(X_tf, W_lr, b_lr)
+            mf_loss = wmse(X_tf, X_pred, C_pred) + l2_reg(W, lam) + l2_reg(H, lam)
+            if train:
+                C_tf = tf.constant(C, dtype=tf.dtypes.float32)
+                conf_loss = cross_entropy_loss(C_tf, C_pred) + l2_reg(C_tf, lam)
+                tot_loss = mf_loss + conf_loss
+                print("epoch: %i, tot_loss: %f, mf_loss: %f, conf_loss: %f" % (step, tot_loss, mf_loss, conf_loss))
+            else:
+                print("epoch: %i, mf_loss: %f" % (step, mf_loss))
+
+        if step == max_iter:
+            print("Increase max_iter: unable to meet convergence criteria")
+            break
 
 
 class MatrixFactorizationClassifier(BaseEstimator):

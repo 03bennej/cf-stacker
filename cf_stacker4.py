@@ -155,7 +155,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
     def fit(self, X, y):
         
-        self.C_train_true = 1 - np.abs(X- np.expand_dims(np.median(X, axis=1), axis=1))
+        self.C_train_true = 1 - np.abs(X - np.expand_dims(np.median(X, axis=1), axis=1))
         
         # self.lr_model = LinearRegression()
         

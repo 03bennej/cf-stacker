@@ -72,9 +72,9 @@ def optimize_W(X, W, H, mu, bw, bh, lam, optimizer, C):
         loss = wmse(X, X_pred, C) + l2_reg(W, lam) + l2_reg(H, lam) \
                 + l2_reg(bw, lam) + l2_reg(bh, lam)
 
-    gradients = tape.gradient(loss, [W, H])
+    gradients = tape.gradient(loss, [W])
 
-    optimizer.apply_gradients(zip(gradients, [W, H]))
+    optimizer.apply_gradients(zip(gradients, [W]))
 
 
 def optimize_H(X, W, H, mu, bw, bh, lam, optimizer, C):
@@ -91,7 +91,7 @@ def optimize_H(X, W, H, mu, bw, bh, lam, optimizer, C):
 def optimization_step(X, W, H, mu, bw, bh, lam, optimizer, C):
     optimize_W(X, W, H, mu, bw, bh, lam, optimizer, C)
 
-    #optimize_H(X, W, H, mu, bw, bh, lam, optimizer, C)
+    optimize_H(X, W, H, mu, bw, bh, lam, optimizer, C)
 
 
 def optimize(X, W, H, mu, bw, bh, lam, optimizer, C, tol, max_iter,

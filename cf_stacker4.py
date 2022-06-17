@@ -64,6 +64,7 @@ def wmse(X_true, X_pred, C=1):
 
 def l2_reg(U, lam):
     return lam * (tf.reduce_mean(tf.pow(U, 2)))
+    # return lam * (tf.reduce_mean(tf.math.abs(U)))
 
 
 def optimize_W(X, W, H, mu, bw, bh, lam, optimizer, C):
@@ -216,11 +217,11 @@ if __name__ == "__main__":
     labels_test = test_data.pop("label").to_numpy()
     y_test = 1 - np.abs(X_test - np.expand_dims(labels_test, axis=1))
 
-    mf_model = MatrixFactorizationClassifier(latent_dim=20,
-                                             max_iter=300,
-                                             learning_rate=0.01,
+    mf_model = MatrixFactorizationClassifier(latent_dim=1,
+                                             max_iter=150,
+                                             learning_rate=0.001,
                                              tol=0.00001,
-                                             lam=0.01)
+                                             lam=0.0000)
     
     lr_model = LinearRegression()
     lr_model.fit(X_train, labels_train)

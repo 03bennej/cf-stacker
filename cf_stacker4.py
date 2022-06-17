@@ -217,7 +217,7 @@ if __name__ == "__main__":
     labels_test = test_data.pop("label").to_numpy()
     y_test = 1 - np.abs(X_test - np.expand_dims(labels_test, axis=1))
 
-    mf_model = MatrixFactorizationClassifier(latent_dim=1,
+    mf_model = MatrixFactorizationClassifier(latent_dim=3,
                                              max_iter=150,
                                              learning_rate=0.001,
                                              tol=0.00001,

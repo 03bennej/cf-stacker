@@ -19,6 +19,7 @@ from sklearn.svm import LinearSVC
 from sklearn.metrics import precision_recall_curve
 
 seed = 625
+tf.random.set_seed(seed)
 
 def fmax_score(y_pred, y_true, beta=1):
     # beta = 0 for precision, beta -> infinity for recall, beta=1 for harmonic mean
@@ -46,7 +47,7 @@ def calculate_biases(X):
 
 
 def define_variables(X_shape, latent_dim):
-    initializer = keras.initializers.RandomUniform(minval=0,
+    initializer = keras.initializers.RandomUniform(minval=-0.01,
                                                    maxval=0.01,
                                                    seed=seed)
     X1, X2 = X_shape
@@ -74,9 +75,9 @@ def optimize_W(X, W, H, mu, bw, bh, lam, optimizer, C):
         loss = wmse(X, X_pred, C) + l2_reg(W, lam) + l2_reg(H, lam) \
                 + l2_reg(bw, lam) + l2_reg(bh, lam)
 
-    gradients = tape.gradient(loss, [W])
+    gradients = tape.gradient(loss, [W, H])
 
-    optimizer.apply_gradients(zip(gradients, [W]))
+    optimizer.apply_gradients(zip(gradients, [W, H]))
 
 
 def optimize_H(X, W, H, mu, bw, bh, lam, optimizer, C):
@@ -93,7 +94,7 @@ def optimize_H(X, W, H, mu, bw, bh, lam, optimizer, C):
 def optimization_step(X, W, H, mu, bw, bh, lam, optimizer, C):
     optimize_W(X, W, H, mu, bw, bh, lam, optimizer, C)
 
-    optimize_H(X, W, H, mu, bw, bh, lam, optimizer, C)
+    #optimize_H(X, W, H, mu, bw, bh, lam, optimizer, C)
 
 
 def optimize(X, W, H, mu, bw, bh, lam, optimizer, C, tol, max_iter,

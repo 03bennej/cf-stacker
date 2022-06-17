@@ -59,7 +59,8 @@ def define_variables(X_shape, latent_dim):
 
 
 def wmse(X_true, X_pred, C=1):
-    return tf.reduce_mean(C * tf.pow(X_true - X_pred, 2))
+    C = tf.constant(C, dtype=tf.dtypes.float32)
+    return tf.reduce_mean(tf.math.multiply(C, tf.pow(X_true - X_pred, 2)))
 
 
 def l2_reg(U, lam):

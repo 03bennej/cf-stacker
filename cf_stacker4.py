@@ -18,9 +18,6 @@ from sklearn.linear_model import LogisticRegression, LinearRegression
 from sklearn.svm import LinearSVC
 from sklearn.metrics import precision_recall_curve
 
-seed = 625
-tf.random.set_seed(seed)
-
 def fmax_score(y_pred, y_true, beta=1):
     # beta = 0 for precision, beta -> infinity for recall, beta=1 for harmonic mean
     precision, recall, threshold = precision_recall_curve(y_true, y_pred)
@@ -49,7 +46,7 @@ def calculate_biases(X):
 def define_variables(X_shape, latent_dim):
     initializer = keras.initializers.RandomUniform(minval=-0.01,
                                                    maxval=0.01,
-                                                   seed=seed)
+                                                   seed=None)
     X1, X2 = X_shape
     W = tf.Variable(initializer(shape=[X1, latent_dim],
                                 dtype=tf.dtypes.float32),

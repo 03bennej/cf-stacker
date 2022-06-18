@@ -29,7 +29,7 @@ def fmax_score(y_pred, y_true, beta=1):
 # def summary
 
 def model(W, H, mu, bw, bh):
-    return tf.linalg.matmul(W, H) #+ mu + bw + bh
+    return tf.linalg.matmul(W, H) + mu + bw + bh
 
 
 def calculate_biases(X):
@@ -59,9 +59,7 @@ def define_variables(X_shape, latent_dim):
 
 def wmse(X_true, X_pred, C=1):
     C = tf.constant(C, dtype=tf.dtypes.float32)
-    se = tf.math.multiply(C, tf.pow(X_true - X_pred, 2))
-    # non_zero = tf.cast(se != 0, dtype=tf.dtypes.float32)
-    return tf.reduce_mean(se) #/ tf.reduce_sum(non_zero)
+    return tf.reduce_mean(tf.math.multiply(C, tf.pow(X_true - X_pred, 2)))
 
 
 def l2_reg(U, lam):

@@ -165,7 +165,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
         self.X_train = X
         
-        self.X_shape = np.shape(X)
+        self.X_train_shape = np.shape(X)
 
         # self.W, self.H = define_variables(self.X_shape, self.latent_dim)
 

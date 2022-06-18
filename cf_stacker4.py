@@ -191,13 +191,13 @@ class MatrixFactorizationClassifier(BaseEstimator):
         
         self.X_comb_shape = np.shape(self.X_comb)
 
-        self.W_comb, H_comb = define_variables(self.X_comb_shape, self.latent_dim)
+        self.W_comb, self.H_comb = define_variables(self.X_comb_shape, self.latent_dim)
 
         self.mu, self.bw, self.bh = calculate_biases(self.X_comb)
 
         optimize(self.X_comb, self.W_comb, self.H_comb, self.mu, self.bw, self.bh,
                  self.lam, self.optimizer, self.C_comb,
-                 self.tol, self.max_iter)
+                 self.tol, self.max_iter, train=True)
 
         self.X_comb_predict = model(self.W_predict, self.H, self.mu, self.bw_predict, self.bh)
 

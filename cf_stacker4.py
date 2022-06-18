@@ -187,7 +187,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
         self.C_predict[self.C_predict >= 0.5] = 1
         self.C_predict[self.C_predict < 0.5] = 0
 
-        self.C_comb = 1 #np.concatenate((self.C_train_true, self.C_predict), axis=0)
+        self.C_comb = np.concatenate((self.C_train_true, self.C_predict), axis=0)
         
         self.X_comb_shape = np.shape(self.X_comb)
 

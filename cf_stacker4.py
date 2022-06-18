@@ -29,13 +29,13 @@ def fmax_score(y_pred, y_true, beta=1):
 # def summary
 
 def model(W, H, mu, bw, bh):
-    return tf.linalg.matmul(W, H) #+ mu + bw + bh
+    return tf.linalg.matmul(W, H) + mu + bw + bh
 
 
 def calculate_biases(X):
-    mu = np.sum(X) / np.count_nonzero(X)
-    muw = np.expand_dims(np.sum(X, axis=1), axis=1) / np.count_nonzero(X, axis=1)
-    muh = np.expand_dims(np.sum(X, axis=0), axis=0) / np.count_nonzero(X, axis=0)
+    mu = np.mean(X)
+    muw = np.expand_dims(np.mean(X, axis=1), axis=1)
+    muh = np.expand_dims(np.mean(X, axis=0), axis=0)
 
     mu = tf.constant(mu, dtype=tf.dtypes.float32)
     bw = tf.constant(muw - mu, dtype=tf.dtypes.float32)

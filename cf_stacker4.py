@@ -162,7 +162,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
         
         self.C_train_true = 1 - np.abs(X - np.expand_dims(y, axis=1))
         self.C_train_true[self.C_train_true >= 0.5] = 1
-        self.C_train_true[self.C_train_true < 0.5] = 0
+        self.C_train_true[self.C_train_true < 0.5] = 0.0
 
         self.lr_model = LinearRegression()
         

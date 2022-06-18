@@ -60,7 +60,7 @@ def define_variables(X_shape, latent_dim):
 def wmse(X_true, X_pred, C=1):
     C = tf.constant(C, dtype=tf.dtypes.float32)
     se = tf.math.multiply(C, tf.pow(X_true - X_pred, 2))
-    non_zero = tf.cast(se != 0, tf.float32)
+    non_zero = tf.cast(se != 0, dtype=tf.dtypes.float32)
     return tf.reduce_sum(se) / tf.reduce_sum(non_zero)
 
 

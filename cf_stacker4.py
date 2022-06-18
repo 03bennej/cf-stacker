@@ -199,7 +199,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
                  self.lam, self.optimizer, self.C_comb,
                  self.tol, self.max_iter, train=True)
 
-        self.X_comb_predict = model(self.W_predict, self.H, self.mu, self.bw_predict, self.bh)
+        self.X_comb_predict = model(self.W_comb, self.H_comb, self.mu, self.bw, self.bh)
 
         self.X_predict = self.X_comb_predict[self.X_train_shape[0]::, :]
 

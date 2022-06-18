@@ -179,8 +179,8 @@ class MatrixFactorizationClassifier(BaseEstimator):
         self.y_predict = np.median(X, axis=1) #self.lr_model.predict(X)
         
         self.C_predict = 16*(X-0.5)**4 # 1 - np.abs(X - np.expand_dims(self.y_predict, axis=1))
-        self.C_predict[self.C_predict >= 0.5] = 2*X + 1
-        self.C_predict[self.C_predict < 0.5] = -(2 * X + 1)
+        self.C_predict[self.C_predict >= 0.5] = 2*X - 1
+        self.C_predict[self.C_predict < 0.5] = -(2 * X - 1)
         
         self.X_shape = np.shape(X)
 

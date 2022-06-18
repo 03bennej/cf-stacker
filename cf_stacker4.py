@@ -29,7 +29,7 @@ def fmax_score(y_pred, y_true, beta=1):
 # def summary
 
 def model(W, H, mu, bw, bh):
-    return tf.linalg.matmul(W, H) + mu + bw + bh
+    return tf.linalg.matmul(W, H) #+ mu + bw + bh
 
 
 def calculate_biases(X):

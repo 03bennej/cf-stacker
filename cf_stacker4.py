@@ -189,8 +189,8 @@ class MatrixFactorizationClassifier(BaseEstimator):
         self.y_predict = self.lr_model.predict(X)
         
         self.C_predict = 1 - np.abs(X - np.expand_dims(self.y_predict, axis=1))
-        self.C_predict[self.C_predict >= 0.5] = 1
-        self.C_predict[self.C_predict < 0.5] = 0.5
+        self.C_predict[self.C_predict >= 0.3] = 1
+        self.C_predict[self.C_predict < 0.3] = 0.0
 
         self.C_comb = np.concatenate((self.C_train_true, self.C_predict), axis=0)
         

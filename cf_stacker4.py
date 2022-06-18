@@ -162,39 +162,46 @@ class MatrixFactorizationClassifier(BaseEstimator):
         self.lr_model = LinearRegression()
         
         self.lr_model.fit(X, y)
+
+        self.X_train = X
         
         self.X_shape = np.shape(X)
 
-        self.W, self.H = define_variables(self.X_shape, self.latent_dim)
+        # self.W, self.H = define_variables(self.X_shape, self.latent_dim)
 
-        self.mu, self.bw, self.bh = calculate_biases(X)
+        # self.mu, self.bw, self.bh = calculate_biases(X)
 
-        optimize(X, self.W, self.H, self.mu, self.bw, self.bh,
-                 self.lam, self.optimizer, self.C_train_true,
-                 self.tol, self.max_iter, train=True)
+        # optimize(X, self.W, self.H, self.mu, self.bw, self.bh,
+        #          self.lam, self.optimizer, self.C_train_true,
+        #          self.tol, self.max_iter, train=True)
 
         return self
 
     def predict(self, X):
+
+        self.X_comb = np.concatenate((self.X_train, X), axis=0)
         
         self.y_predict = self.lr_model.predict(X)
         
         self.C_predict = 1 - np.abs(X - np.expand_dims(self.y_predict, axis=1))
         self.C_predict[self.C_predict >= 0.5] = 1
         self.C_predict[self.C_predict < 0.5] = 0
+
+        self.C_comb = np.concatenate((self.C_train_true, C_predict), axis=0)
         
-        self.X_shape = np.shape(X)
+        self.X_comb_shape = np.shape(self.X_comb)
 
-        self.W_predict, _ = define_variables(self.X_shape, self.latent_dim)
+        self.W_comb, H_comb = define_variables(self.X_comb_shape, self.latent_dim)
 
-        _, self.bw_predict, _ = calculate_biases(X)
+        self.mu, self.bw, self.bh = calculate_biases(self.X_comb)
 
-        optimize(X, self.W_predict, self.H, self.mu, self.bw_predict, self.bh,
-                 self.lam, self.optimizer, self.C_predict,
+        optimize(self.X_comb, self.W_comb, self.H_comb, self.mu, self.bw, self.bh,
+                 self.lam, self.optimizer, self.C_comb,
                  self.tol, self.max_iter)
 
-        self.X_predict = model(self.W_predict, self.H, self.mu, self.bw_predict, self.bh)
+        self.X_comb_predict = model(self.W_predict, self.H, self.mu, self.bw_predict, self.bh)
 
+        self.X_predict = self.X_comb_predict[self.X_train_shape[0]::, :]
 
         if self.method == 'mean':
             self.X_predict = np.mean(self.X_predict, axis=1)

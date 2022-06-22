@@ -162,7 +162,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
         
         self.C_train_true = 1 - np.abs(X - np.expand_dims(y, axis=1))
         self.C_train_true[self.C_train_true >= 0.5] = 1
-        self.C_train_true[self.C_train_true < 0.5] = 0.0
+        self.C_train_true[self.C_train_true < 0.5] = 1
 
         self.lr_model = LinearRegression()
         
@@ -190,7 +190,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
         
         self.C_predict = 1 - np.abs(X - np.expand_dims(self.y_predict, axis=1))
         self.C_predict[self.C_predict >= 0.5] = 1
-        self.C_predict[self.C_predict < 0.5] = 0.05
+        self.C_predict[self.C_predict < 0.5] = 1
 
         self.C_comb = np.concatenate((self.C_train_true, self.C_predict), axis=0)
         

@@ -215,8 +215,8 @@ class MatrixFactorizationClassifier(BaseEstimator):
                                         self.optimizer,
                                         lam=self.lam).numpy()
             step+=1
-            if step % 100 == 0:
-                print(loss)
+            # if step % 100 == 0:
+            #     print(loss)
             if step == self.max_iter:
                 print("Increase max_iter: unable to meet convergence criteria")
                 break

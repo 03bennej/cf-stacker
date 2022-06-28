@@ -171,11 +171,11 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
         self.mu, self.bw, self.bh = calculate_biases(X)
 
-        optimize(X, self.W, self.H, self.mu, self.bw, self.bh,
-                 self.lam, self.optimizer,
-                 self.tol, self.max_iter, train=True)
-
-        self.lr_model.fit(model(self.W, self.H, self.mu, self.bw, self.bh), y)
+        if self.method == "lr":
+            optimize(X, self.W, self.H, self.mu, self.bw, self.bh,
+                     self.lam, self.optimizer,
+                     self.tol, self.max_iter, train=True)
+            self.lr_model.fit(model(self.W, self.H, self.mu, self.bw, self.bh), y)
 
         return self
 

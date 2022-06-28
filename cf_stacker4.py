@@ -158,7 +158,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
         self.b1 = None
         self.b2 = None
 
-        if method == "lr":
+        if self.method == "lr":
             self.lr_model = LinearRegression()
 
     def fit(self, X, y):

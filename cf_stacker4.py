@@ -158,15 +158,16 @@ class MatrixFactorizationClassifier(BaseEstimator):
         self.b1 = None
         self.b2 = None
 
-    def fit(self, X, y):
+        if method == "lr":
+            self.lr_model = LinearRegression()
 
-        self.lr_model = LinearRegression()
+    def fit(self, X, y):
 
         self.X_train = X
         
         self.X_train_shape = np.shape(X)
 
-        self.W, self.H = define_variables(self.X_shape, self.latent_dim)
+        self.W, self.H = define_variables(self.X_train_shape, self.latent_dim)
 
         self.mu, self.bw, self.bh = calculate_biases(X)
 

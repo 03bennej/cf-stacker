@@ -187,9 +187,9 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
         self.W_comb, self.H_comb = define_variables(self.X_comb_shape, self.latent_dim)
 
-        self.W_comb[:self.X_train_shape[0], :] = self.W
+        # self.W_comb[:self.X_train_shape[0], :] = self.W
 
-        self.H_comb[:, self.X_train_shape[1]] = self.H
+        # self.H_comb[:, self.X_train_shape[1]] = self.H
 
         self.mu, self.bw, self.bh = calculate_biases(self.X_comb)
 

@@ -176,7 +176,10 @@ class MatrixFactorizationClassifier(BaseEstimator):
                      self.lam, self.optimizer,
                      self.tol, self.max_iter, train=True)
             self.lr_model.fit(model(self.W, self.H, self.mu, self.bw, self.bh), y)
+            train_data = np.concatenate((model(self.W, self.H, self.mu, self.bw, self.bh), X), axis=0)
+            train_labels = np.concatenate((y, y))
             # self.lr_model.fit(X, y)
+            self.lr_model.fit(train_data, train_labels)
 
         return self
 

@@ -75,7 +75,7 @@ def l2_reg(U, lam):
 def optimize_W(X, W, H, mu, bw, bh, lam, optimizer, C):
     with tf.GradientTape() as tape:
         X_pred = model(W, H, mu, bw, bh)
-        loss = wmse(X, X_pred, C) + l2_reg(W, lam) + l2_reg(H, lam) \
+        loss = wmse(X, X_pred) + l2_reg(W, lam) + l2_reg(H, lam) \
                 + l2_reg(bw, lam) + l2_reg(bh, lam)
 
     gradients = tape.gradient(loss, [W])
@@ -94,20 +94,20 @@ def optimize_H(X, W, H, mu, bw, bh, lam, optimizer, C):
     optimizer.apply_gradients(zip(gradients, [H]))
 
 
-def optimization_step(X, W, H, mu, bw, bh, lam, optimizer, C):
-    optimize_W(X, W, H, mu, bw, bh, lam, optimizer, C)
+def optimization_step(X, W, H, mu, bw, bh, lam, optimizer):
+    optimize_W(X, W, H, mu, bw, bh, lam, optimizer)
 
-    optimize_H(X, W, H, mu, bw, bh, lam, optimizer, C)
+    optimize_H(X, W, H, mu, bw, bh, lam, optimizer)
 
 
-def optimize(X, W, H, mu, bw, bh, lam, optimizer, C, tol, max_iter,
+def optimize(X, W, H, mu, bw, bh, lam, optimizer, tol, max_iter,
              train=False):
     step = 0
 
     X_tf = tf.constant(X, dtype=tf.dtypes.float32)
 
     X_pred = model(W, H, mu, bw, bh)
-    loss = wmse(X_tf, X_pred, C) + l2_reg(W, lam) + l2_reg(H, lam) \
+    loss = wmse(X_tf, X_pred) + l2_reg(W, lam) + l2_reg(H, lam) \
             + l2_reg(bw, lam) + l2_reg(bh, lam)
 
 
@@ -115,17 +115,17 @@ def optimize(X, W, H, mu, bw, bh, lam, optimizer, C, tol, max_iter,
 
         if train:
 
-            optimization_step(X_tf, W, H, mu, bw, bh, lam, optimizer, C)
+            optimization_step(X_tf, W, H, mu, bw, bh, lam, optimizer)
 
         else:
 
-            optimize_W(X_tf, W, H, mu, bw, bh, lam, optimizer, C)
+            optimize_W(X_tf, W, H, mu, bw, bh, lam, optimizer)
 
         step = step + 1
 
         if step % 100 == 0:
             X_pred = model(W, H, mu, bw, bh)
-            loss = wmse(X_tf, X_pred, C) + l2_reg(W, lam) + l2_reg(H, lam)
+            loss = wmse(X_tf, X_pred) + l2_reg(W, lam) + l2_reg(H, lam)
 
             print("epoch: %i, loss: %f" % (step, loss))
 

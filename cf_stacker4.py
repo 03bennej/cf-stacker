@@ -86,7 +86,7 @@ def optimize_W(X, W, H, mu, bw, bh, lam, optimizer):
 def optimize_H(X, W, H, mu, bw, bh, lam, optimizer):
     with tf.GradientTape() as tape:
         X_pred = model(W, H, mu, bw, bh)
-        loss = wmse(X, X_pred, C) + l2_reg(W, lam) + l2_reg(H, lam) \
+        loss = wmse(X, X_pred) + l2_reg(W, lam) + l2_reg(H, lam) \
                 + l2_reg(bw, lam) + l2_reg(bh, lam)
 
     gradients = tape.gradient(loss, [H])

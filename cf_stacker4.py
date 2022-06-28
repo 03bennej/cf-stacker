@@ -205,7 +205,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
         elif self.method == 'median':
             self.X_predict = np.median(self.X_predict, axis=1)
         elif self.method == 'lr':
-            self.X_predict = self.lr_model.predict(self.X_predict)
+            self.X_predict = self.lr_model.predict_proba(self.X_predict)
 
         self.X_predict = np.clip(self.X_predict,
                                  a_min=0,

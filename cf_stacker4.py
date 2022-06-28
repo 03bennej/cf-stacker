@@ -180,6 +180,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
         return self
 
     def predict(self, X):
+        print("predicting")
 
         self.X_comb = np.concatenate((self.X_train, X), axis=0)
         

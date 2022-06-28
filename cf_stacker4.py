@@ -175,7 +175,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
                  self.lam, self.optimizer,
                  self.tol, self.max_iter, train=True)
 
-        self.lr_model.fit(model(self.W_comb, self.H_comb, self.mu, self.bw, self.bh), y)
+        self.lr_model.fit(model(self.W, self.H, self.mu, self.bw, self.bh), y)
 
         return self
 

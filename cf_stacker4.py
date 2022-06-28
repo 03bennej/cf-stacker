@@ -72,7 +72,7 @@ def l2_reg(U, lam):
     # return lam * (tf.reduce_mean(tf.math.abs(U)))
 
 
-def optimize_W(X, W, H, mu, bw, bh, lam, optimizer, C):
+def optimize_W(X, W, H, mu, bw, bh, lam, optimizer):
     with tf.GradientTape() as tape:
         X_pred = model(W, H, mu, bw, bh)
         loss = wmse(X, X_pred) + l2_reg(W, lam) + l2_reg(H, lam) \
@@ -83,7 +83,7 @@ def optimize_W(X, W, H, mu, bw, bh, lam, optimizer, C):
     optimizer.apply_gradients(zip(gradients, [W]))
 
 
-def optimize_H(X, W, H, mu, bw, bh, lam, optimizer, C):
+def optimize_H(X, W, H, mu, bw, bh, lam, optimizer):
     with tf.GradientTape() as tape:
         X_pred = model(W, H, mu, bw, bh)
         loss = wmse(X, X_pred, C) + l2_reg(W, lam) + l2_reg(H, lam) \

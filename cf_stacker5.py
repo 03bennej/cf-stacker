@@ -241,10 +241,10 @@ if __name__ == "__main__":
     y_test = test_data.pop("label").to_numpy()
 
     mf_model = MatrixFactorizationClassifier(latent_dim=10,
-                                             max_iter=200,
+                                             max_iter=500,
                                              learning_rate=0.1,
                                              tol=0.0000000001,
-                                             lam=0.0)
+                                             lam=0.5)
     mf_model.fit(X_train, y_train)
     y_pred = mf_model.predict(X_test)
     

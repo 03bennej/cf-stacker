@@ -159,7 +159,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
         self.b2 = None
 
         if self.method == "lr":
-            self.lr_model = LinearRegression()
+            self.lr_model = LogisticRegression()
 
     def fit(self, X, y):
 

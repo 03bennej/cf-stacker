@@ -189,9 +189,6 @@ class MatrixFactorizationClassifier(BaseEstimator):
         self.method = method
         self.optimizer = keras.optimizers.Adam(self.learning_rate)
 
-        if self.method == "lr":
-            self.lr_model = LogisticRegression()
-
     def fit(self, X, y):
         
         X_tf = tf.constant(X, dtype=tf.dtypes.float32)

@@ -190,6 +190,10 @@ class MatrixFactorizationClassifier(BaseEstimator):
         self.optimizer = keras.optimizers.Adam(self.learning_rate)
 
     def fit(self, X, y):
+
+        self.fit_lr(X, y)
+
+    def fit_lr(self, X, y):
         
         X_tf = tf.constant(X, dtype=tf.dtypes.float32)
         # initializer = keras.initializers.RandomUniform(minval=-0.05,

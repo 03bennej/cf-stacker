@@ -193,6 +193,8 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
         self.fit_lr(X, y)
 
+        return self
+
     def fit_lr(self, X, y):
         
         X_tf = tf.constant(X, dtype=tf.dtypes.float32)

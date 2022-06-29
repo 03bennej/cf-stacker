@@ -222,6 +222,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
                 break
         return self
 
+
     def predict(self, X):
         X_tf = tf.constant(X, dtype=tf.dtypes.float32)
         self.y_pred = logistic_regression(X_tf, self.W, self.b).numpy()
@@ -241,7 +242,7 @@ if __name__ == "__main__":
     y_test = test_data.pop("label").to_numpy()
 
     mf_model = MatrixFactorizationClassifier(latent_dim=10,
-                                             max_iter=500,
+                                             max_iter=200,
                                              learning_rate=0.1,
                                              tol=0.0000000001,
                                              lam=0.5)

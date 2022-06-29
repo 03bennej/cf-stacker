@@ -195,7 +195,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
         return self
 
-    def fit_mf(self, X, y):
+    # def fit_mf(self, X, y):
 
 
     def fit_lr(self, X, y):

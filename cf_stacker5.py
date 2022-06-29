@@ -195,17 +195,15 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
         return self
 
+    def fit_mf(self, X, y):
+
+
     def fit_lr(self, X, y):
         
         X_tf = tf.constant(X, dtype=tf.dtypes.float32)
-        # initializer = keras.initializers.RandomUniform(minval=-0.05,
-        #                                                maxval=0.05,
-        #                                                seed=None)
-        # self.W = tf.Variable(initializer(shape=[X.shape[1], 1],
-        #                             dtype=tf.dtypes.float32),
-        #                 trainable=True)
+
         self.W = tf.Variable(tf.zeros([X.shape[1], 2]), name="weight")
-        self.b = tf.Variable(tf.zeros([1]), name="bias")
+        self.b = tf.Variable(tf.zeros([2]), name="bias")
         
         y_hat = logistic_regression(X_tf, self.W, self.b)
         loss = bce_loss(y_hat, y, self.W, self.b, lam=self.lam).numpy()

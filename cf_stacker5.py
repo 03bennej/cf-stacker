@@ -18,7 +18,7 @@ from sklearn.linear_model import LogisticRegression, LinearRegression
 from sklearn.svm import LinearSVC
 from sklearn.metrics import precision_recall_curve
 
-def fmax_score(y_pred, y_true, beta=1, display=False):
+def fmax_score(y_true, y_pred, beta=1, display=False):
     # beta = 0 for precision, beta -> infinity for recall, beta=1 for harmonic mean
     precision, recall, threshold = precision_recall_curve(y_true, y_pred)
     fmeasure = (1 + beta ** 2) * (precision * recall) / ((beta ** 2 * precision) + recall)
@@ -44,20 +44,25 @@ def wmse(X_true, X_pred, C=1):
     non_zero = tf.cast(se != 0, dtype=tf.dtypes.float32)
     return tf.reduce_sum(se) / tf.reduce_sum(non_zero)
 
+
 def l2_reg(U, lam):
     return lam * (tf.reduce_mean(tf.pow(U, 2)))
     # return lam * (tf.reduce_mean(tf.math.abs(U)))
 
 
-def model(W, H, mu, bw, bh):
-    return tf.linalg.matmul(W, H) #+ mu + bw + bh
+def model(W, H):
+    return tf.linalg.matmul(W, H)
 
 
-def logistic_regression(X, W, b):
-    return tf.nn.softmax(tf.matmul(X, W) + b)
+def logistic_regression(X, omega, b):
+    return tf.nn.softmax(tf.matmul(X, omega) + b)
 
 
-def bce_loss(y_pred, y_true, W, b, lam):
+def format_lr(yh):
+    return tf.expand_dims(yh[:, 1], axis=-1)
+
+
+def bce_loss(y_true, y_pred):
     
     y_true = tf.one_hot(y_true, depth=2)
 
@@ -65,9 +70,7 @@ def bce_loss(y_pred, y_true, W, b, lam):
     
     bce = tf.reduce_mean(-tf.reduce_sum(y_true * tf.math.log(y_pred), axis=1))
     
-    reg = l2_reg(W, lam) #+ l2_reg(b, lam)
-    
-    return bce + reg
+    return bce
 
 
 def lr_optimization_step(X, y, W, b, optimizer, lam):
@@ -85,17 +88,6 @@ def lr_optimization_step(X, y, W, b, optimizer, lam):
     return loss
 
 
-def calculate_biases(X):
-    mu = np.mean(X)
-    muw = np.expand_dims(np.mean(X, axis=1), axis=1)
-    muh = np.expand_dims(np.mean(X, axis=0), axis=0)
-
-    mu = tf.constant(mu, dtype=tf.dtypes.float32)
-    bw = tf.constant(muw - mu, dtype=tf.dtypes.float32)
-    bh = tf.constant(muh - mu, dtype=tf.dtypes.float32)
-    return mu, bw, bh
-
-
 def define_variables(X_shape, latent_dim):
     initializer = keras.initializers.RandomUniform(minval=-0.01,
                                                    maxval=0.01,
@@ -107,65 +99,94 @@ def define_variables(X_shape, latent_dim):
     H = tf.Variable(initializer(shape=[latent_dim, X2],
                                 dtype=tf.dtypes.float32),
                     trainable=True)
-    return W, H
+    omega = tf.Variable(tf.zeros([X_shape[1], 2]), name="weight")
+    beta = tf.Variable(tf.zeros([2]), name="bias")
+    return W, H, omega, beta
 
 
-def optimize_W(X, W, H, mu, bw, bh, lam, optimizer):
+def calc_C(X, y): # return binary matrix
+    # return tf.math.floor(1 - tf.math.abs(X - y) + 1/2)
+    return 1 - tf.math.abs(X - y)
+
+
+def train_losses(X, Xh, y, yh, W, H, omega, lam1, lam2, alpha):
+    C = calc_C(X, yh)
+    loss_mf = wmse(X, Xh, C) + l2_reg(W, lam1) + l2_reg(H, lam1)
+    loss_lr = bce_loss(y, yh) + l2_reg(omega, lam2)
+    combined_loss = alpha * loss_mf + (1-alpha) * loss_lr
+    return combined_loss, loss_mf, loss_lr
+
+
+def test_loss(X, Xh, yh, W, H, lam1, alpha):
+    C = calc_C(X, yh)
+    return alpha * (wmse(X, Xh, C) + l2_reg(W, lam1) + l2_reg(H, lam1))    
+
+
+def optimization_train_step(X, y, W, H, omega, b, lam1, lam2, alpha, optimizer):
     with tf.GradientTape() as tape:
-        X_pred = model(W, H, mu, bw, bh)
-        loss = wmse(X, X_pred) + l2_reg(W, lam) + l2_reg(H, lam) \
-                + l2_reg(bw, lam) + l2_reg(bh, lam)
+        Xh = model(W, H)
+        yh = format_lr(logistic_regression(Xh, omega, b))
+        combined_loss, mf_loss, lr_loss = train_losses(X, Xh, y, yh, W, H, omega, lam1, lam2, alpha) 
 
-    gradients = tape.gradient(loss, [W])
+    gradients = tape.gradient(combined_loss, [W, H, omega, b])
 
-    optimizer.apply_gradients(zip(gradients, [W]))
+    optimizer.apply_gradients(zip(gradients, [W, H, omega, b]))
+    
+    return combined_loss, mf_loss, lr_loss
 
 
-def optimize_H(X, W, H, mu, bw, bh, lam, optimizer):
+def optimization_test_step(X_train, X_test, W_train, W_test, H, omega, b, lam1, lam2, alpha, optimizer):
+    X_comb = tf.concat((X_train, X_test), axis=0)
+    W_comb = tf.concat((W_train, W_test), axis=0)
     with tf.GradientTape() as tape:
-        X_pred = model(W, H, mu, bw, bh)
-        loss = wmse(X, X_pred) + l2_reg(W, lam) + l2_reg(H, lam) \
-                + l2_reg(bw, lam) + l2_reg(bh, lam)
+        Xh = model(W_test, H)
+        yh = format_lr(logistic_regression(Xh, omega, b))
+        mf_loss = test_loss(X_test, Xh, yh, W_test, H, lam1, alpha)
 
-    gradients = tape.gradient(loss, [H])
+    gradients = tape.gradient(mf_loss, [W_test])
 
-    optimizer.apply_gradients(zip(gradients, [H]))
-
-
-def optimization_step(X, W, H, mu, bw, bh, lam, optimizer):
-    optimize_W(X, W, H, mu, bw, bh, lam, optimizer)
-
-    optimize_H(X, W, H, mu, bw, bh, lam, optimizer)
+    optimizer.apply_gradients(zip(gradients, [W_test]))
+    
+    return mf_loss
 
 
-def optimize(X, W, H, mu, bw, bh, lam, optimizer, tol, max_iter,
-             train=False):
+def optimize_train(X, y, W, H, omega, b, lam1, lam2, alpha, optimizer, tol, max_iter):
     step = 0
+    Xh = model(W, H)
+    yh = format_lr(logistic_regression(Xh, omega, b))
+    combined_loss, mf_loss, lr_loss = train_losses(X, Xh, y, yh, W, H, omega, lam1, lam2, alpha) 
 
-    X_tf = tf.constant(X, dtype=tf.dtypes.float32)
+    while combined_loss > tol:
 
-    X_pred = model(W, H, mu, bw, bh)
-    loss = wmse(X_tf, X_pred) + l2_reg(W, lam) + l2_reg(H, lam) \
-            + l2_reg(bw, lam) + l2_reg(bh, lam)
-
-
-    while loss > tol:
-
-        if train:
-
-            optimization_step(X_tf, W, H, mu, bw, bh, lam, optimizer)
-
-        else:
-
-            optimize_W(X_tf, W, H, mu, bw, bh, lam, optimizer)
+        combined_loss, mf_loss, lr_loss = optimization_train_step(X, y, W, H, omega, b, lam1, lam2, alpha, optimizer)
 
         step = step + 1
 
         if step % 100 == 0:
-            X_pred = model(W, H, mu, bw, bh)
-            loss = wmse(X_tf, X_pred) + l2_reg(W, lam) + l2_reg(H, lam)
 
-            print("epoch: %i, loss: %f" % (step, loss))
+            print("epoch: %i, combined_loss: %f, mf_loss: %f, lr_loss: %f" % (step, combined_loss, mf_loss, lr_loss))
+
+        if step == max_iter:
+            print("Increase max_iter: unable to meet convergence criteria")
+            break
+        
+def optimize_test(X_train, X_test, W_train, W_test, H, omega, b, lam1, lam2, alpha, optimizer, tol, max_iter):
+    step = 0
+    X_comb = tf.concat((X_train, X_test), axis=0)
+    W_comb = tf.concat((W_train, W_test), axis=0)
+    Xh = model(W_comb, H)
+    yh = format_lr(logistic_regression(Xh, omega, b))
+    mf_loss = test_loss(X_comb, Xh, yh, W_comb, H, lam1, alpha) 
+
+    while mf_loss > tol:
+
+        mf_loss = optimization_test_step(X_train, X_test, W_train, W_test, H, omega, b, lam1, lam2, alpha, optimizer)
+
+        step = step + 1
+
+        if step % 100 == 0:
+
+            print("epoch: %i, mf_loss: %f" % (step, mf_loss))
 
         if step == max_iter:
             print("Increase max_iter: unable to meet convergence criteria")
@@ -176,13 +197,17 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
     def __init__(self,
                  latent_dim=50,
-                 lam=0.0,
+                 lam_WH=0.0,
+                 lam_omega=0.0,
+                 alpha=0.99,
                  tol=0.0001,
                  max_iter=500,
-                 learning_rate=0.1,
+                 learning_rate=0.05,
                  method="mean"):
         self.latent_dim = latent_dim
-        self.lam = lam
+        self.lam_WH = lam_WH
+        self.lam_omega = lam_omega
+        self.alpha = alpha
         self.tol = tol
         self.max_iter = max_iter
         self.learning_rate = learning_rate
@@ -190,29 +215,50 @@ class MatrixFactorizationClassifier(BaseEstimator):
         self.optimizer = keras.optimizers.Adam(self.learning_rate)
 
     def fit(self, X, y):
+        
+        self.X_train = tf.constant(X, dtype=tf.dtypes.float32)
+        
+        y = tf.constant(np.expand_dims(y, axis=-1), dtype=tf.dtypes.int32)
+        
+        self.W_train, self.H, self.omega, self.beta = define_variables(np.shape(X), self.latent_dim)
 
-        self.fit_lr(X, y)
+        optimize_train(self.X_train, y, self.W_train, self.H, self.omega, self.beta, 
+                       self.lam_WH, self.lam_omega, self.alpha, self.optimizer, 
+                       self.tol, self.max_iter)
 
         return self
-
-    # def fit_mf(self, X, y):
-
-
+    
+    
+    def predict(self, X, max_iter):
+        
+        self.X_test = tf.constant(X, dtype=tf.dtypes.float32)
+        
+        self.W_test, _, _, _ = define_variables(np.shape(X), self.latent_dim)
+        
+        optimize_test(self.X_train, self.X_test, self.W_train, self.W_test, 
+                      self.H, self.omega, self.beta, self.lam_WH, self.lam_omega, 
+                      self.alpha, self.optimizer, self.tol, max_iter)
+        
+        self.y_predict =  logistic_regression(self.W_test @ self.H, self.omega, self.beta)   
+            
+        return self.y_predict
+    
+    
     def fit_lr(self, X, y):
         
         X_tf = tf.constant(X, dtype=tf.dtypes.float32)
 
-        self.W = tf.Variable(tf.zeros([X.shape[1], 2]), name="weight")
-        self.b = tf.Variable(tf.zeros([2]), name="bias")
+        self.omega = tf.Variable(tf.zeros([X.shape[1], 2]), name="weight")
+        self.beta = tf.Variable(tf.zeros([2]), name="bias")
         
-        y_hat = logistic_regression(X_tf, self.W, self.b)
-        loss = bce_loss(y_hat, y, self.W, self.b, lam=self.lam).numpy()
+        y_hat = logistic_regression(X_tf, self.omega, self.beta)
+        loss = bce_loss(y, y_hat, self.omega, self.beta, lam=self.lam).numpy()
         step=0
         while loss > self.tol:
             loss = lr_optimization_step(X_tf, 
                                         y, 
-                                        self.W, 
-                                        self.b, 
+                                        self.omega, 
+                                        self.beta, 
                                         self.optimizer,
                                         lam=self.lam).numpy()
             step+=1
@@ -224,9 +270,10 @@ class MatrixFactorizationClassifier(BaseEstimator):
         return self
 
 
-    def predict(self, X):
-        X_tf = tf.constant(X, dtype=tf.dtypes.float32)
-        self.y_pred = logistic_regression(X_tf, self.W, self.b).numpy()
+    def predict_lr(self, X):
+        self.X_pred_new = self.mf_transform(X)
+        X_tf = tf.constant(self.X_pred_new, dtype=tf.dtypes.float32)
+        self.y_pred = logistic_regression(X_tf, self.omega, self.beta).numpy()
         self.y_pred = self.y_pred[:,1]
         return self.y_pred
 
@@ -243,17 +290,19 @@ if __name__ == "__main__":
     y_test = test_data.pop("label").to_numpy()
 
     mf_model = MatrixFactorizationClassifier(latent_dim=10,
-                                             max_iter=200,
-                                             learning_rate=0.1,
+                                             alpha=0.3,
+                                             max_iter=2000,
+                                             learning_rate=0.01,
                                              tol=0.0000000001,
-                                             lam=0.5)
+                                             lam_WH=0.0,
+                                             lam_omega=0.0)
     mf_model.fit(X_train, y_train)
-    y_pred = mf_model.predict(X_test)
+    y_pred = mf_model.predict(X_train, max_iter=2000)[:, 1]
     
     sk_lr = LogisticRegression()
     sk_lr.fit(X_train, y_train)
     sk_y_pred = sk_lr.predict_proba(X_test)[:, 1]
     
-    fmax_score(y_pred, y_test, display=True)
-    fmax_score(sk_y_pred, y_test, display=True)
+    fmax_score(y_train, y_pred, display=True)
+    fmax_score(y_test, sk_y_pred, display=True)
 

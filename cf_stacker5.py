@@ -87,7 +87,7 @@ def define_variables(X_shape, latent_dim):
     # omega = tf.Variable(tf.zeros([X_shape[1], 1]),
     #                     dtype=tf.dtypes.float32)
     # beta = tf.Variable(tf.convert_to_tensor(np.array([0.5], dtype=np.float32)), dtype=tf.dtypes.float32)
-    omega = tf.Variable(tf.ones([X_shape[1], 1]),
+    omega = tf.Variable(tf.zeros([X_shape[1], 1]),
                         dtype=tf.dtypes.float32)
     beta = tf.Variable(tf.zeros([1]), dtype=tf.dtypes.float32)
     # omega = tf.Variable(initializer2(shape=[X_shape[1], 1],
@@ -267,9 +267,9 @@ if __name__ == "__main__":
     y_test = test_data.pop("label").to_numpy()
 
     mf_model = MatrixFactorizationClassifier(latent_dim=10,
-                                             alpha=0.99,
+                                             alpha=0.95,
                                              max_iter=2000,
-                                             learning_rate=0.01,
+                                             learning_rate=0.005,
                                              tol=0.0000000001,
                                              lam_WH=0.0,
                                              lam_omega=0.1)

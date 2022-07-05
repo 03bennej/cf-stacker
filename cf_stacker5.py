@@ -147,9 +147,9 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
         self.optimize_test(X_train=self.X_train, X_test=self.X_test)
 
-        self.y_predict = logistic_regression(self.X_test, self.omega, self.beta)
+        self.y_predict = logistic_regression(self.X_test, self.omega, self.beta).numpy()
 
-        return self.y_predict
+        return self.y_predict[:, 0]
 
     def train_losses(self, X, Xh, y, yh, W, H, omega):
         loss_mf = wmse(X, Xh, self.C_train) + l2_reg(W, self.lam_WH) + l2_reg(H, self.lam_WH)

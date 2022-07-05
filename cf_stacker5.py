@@ -69,20 +69,23 @@ def bce_loss(y_true, y_pred):
 
 
 def define_variables(X_shape, latent_dim):
-    initializer = keras.initializers.RandomUniform(minval=-0.01,
+    initializer1 = keras.initializers.RandomUniform(minval=-0.01,
                                                    maxval=0.01,
                                                    seed=None)
+    initializer2 = keras.initializers.RandomUniform(minval=1.01,
+                                                   maxval=0.99,
+                                                   seed=None)
     X1, X2 = X_shape
-    W = tf.Variable(initializer(shape=[X1, latent_dim],
+    W = tf.Variable(initializer1(shape=[X1, latent_dim],
                                 dtype=tf.dtypes.float32),
                     trainable=True)
-    H = tf.Variable(initializer(shape=[latent_dim, X2],
+    H = tf.Variable(initializer1(shape=[latent_dim, X2],
                                 dtype=tf.dtypes.float32),
                     trainable=True)
-    omega = tf.Variable(initializer(shape=[X_shape[1], 1],
+    omega = tf.Variable(initializer2(shape=[X_shape[1], 1],
                         dtype=tf.dtypes.float32),
                         trainable=True)
-    beta = tf.Variable(initializer(shape=[1, 1],
+    beta = tf.Variable(initializer2(shape=[1, 1],
                         dtype=tf.dtypes.float32),
                         trainable=True)
     return W, H, omega, beta

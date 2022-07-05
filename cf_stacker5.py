@@ -155,8 +155,6 @@ class MatrixFactorizationClassifier(BaseEstimator):
         return self
 
     def predict(self, X):
-        
-        self.max_iter = 250
 
         print("PREDICTING")
 
@@ -249,7 +247,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
             if step % 100 == 0:
                 print("epoch: %i, mf_loss: %f" % (step, mf_loss))
 
-            if step == self.max_iter:
+            if step == 200:
                 print("Increase max_iter: unable to meet convergence criteria")
                 break
 

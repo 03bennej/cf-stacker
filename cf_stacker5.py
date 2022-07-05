@@ -62,8 +62,10 @@ def format_lr(yh):
 
 def bce_loss(y_true, y_pred):
     y_pred = tf.clip_by_value(y_pred, 1e-9, 1.)
+    
+    neg_pos_ratio = np.count_nonzero(y_true) / np.count_nonzero(y_true) 
 
-    bce = -tf.reduce_mean(y_true * tf.math.log(y_pred) + (1 - y_true) * tf.math.log(1 - y_pred))
+    bce = -tf.reduce_mean(neg_pos_ratio * y_true * tf.math.log(y_pred) + (1 - y_true) * tf.math.log(1 - y_pred)) / neg_pos_ratio
 
     return bce
 
@@ -72,9 +74,9 @@ def define_variables(X_shape, latent_dim):
     initializer1 = keras.initializers.RandomUniform(minval=-0.01,
                                                    maxval=0.01,
                                                    seed=None)
-    initializer2 = keras.initializers.RandomUniform(minval=1.01,
-                                                   maxval=0.99,
-                                                   seed=None)
+    # initializer2 = keras.initializers.RandomUniform(minval=1.01,
+    #                                                maxval=0.99,
+    #                                                seed=None)
     X1, X2 = X_shape
     W = tf.Variable(initializer1(shape=[X1, latent_dim],
                                 dtype=tf.dtypes.float32),
@@ -82,12 +84,18 @@ def define_variables(X_shape, latent_dim):
     H = tf.Variable(initializer1(shape=[latent_dim, X2],
                                 dtype=tf.dtypes.float32),
                     trainable=True)
-    omega = tf.Variable(initializer2(shape=[X_shape[1], 1],
-                        dtype=tf.dtypes.float32),
-                        trainable=True)
-    beta = tf.Variable(initializer2(shape=[1, 1],
-                        dtype=tf.dtypes.float32),
-                        trainable=True)
+    # omega = tf.Variable(tf.zeros([X_shape[1], 1]),
+    #                     dtype=tf.dtypes.float32)
+    # beta = tf.Variable(tf.convert_to_tensor(np.array([0.5], dtype=np.float32)), dtype=tf.dtypes.float32)
+    omega = tf.Variable(tf.ones([X_shape[1], 1]),
+                        dtype=tf.dtypes.float32)
+    beta = tf.Variable(tf.zeros([1]), dtype=tf.dtypes.float32)
+    # omega = tf.Variable(initializer2(shape=[X_shape[1], 1],
+    #                     dtype=tf.dtypes.float32),
+    #                     trainable=True)
+    # beta = tf.Variable(initializer2(shape=[1, 1],
+    #                     dtype=tf.dtypes.float32),
+    #                     trainable=True)
     return W, H, omega, beta
 
 
@@ -103,8 +111,8 @@ def calculate_biases(X):
 
 
 def calc_C(X, y):  # return binary matrix
-    return tf.math.floor(1 - tf.math.abs(X - y) + 1 / 2)
-    # return 1 - tf.math.abs(X - y)
+    # return tf.math.floor(1 - tf.math.abs(X - y) + 1 / 2)
+    return 1 - tf.math.abs(X - y)
 
 
 class MatrixFactorizationClassifier(BaseEstimator):
@@ -261,10 +269,10 @@ if __name__ == "__main__":
     mf_model = MatrixFactorizationClassifier(latent_dim=10,
                                              alpha=0.99,
                                              max_iter=2000,
-                                             learning_rate=0.001,
+                                             learning_rate=0.01,
                                              tol=0.0000000001,
                                              lam_WH=0.0,
-                                             lam_omega=0.0)
+                                             lam_omega=0.1)
     mf_model.fit(X_train, y_train)
     # %%
     y_pred = mf_model.predict(X_test)

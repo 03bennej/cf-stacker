@@ -123,6 +123,8 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
     def fit(self, X, y):
 
+        print("TRAINING")
+
         self.X_train = tf.constant(X, dtype=tf.dtypes.float32)
 
         y = np.expand_dims(y, axis=-1)
@@ -138,6 +140,8 @@ class MatrixFactorizationClassifier(BaseEstimator):
         return self
 
     def predict(self, X):
+
+        print("PREDICTING")
 
         self.X_test = tf.constant(X, dtype=tf.dtypes.float32)
 

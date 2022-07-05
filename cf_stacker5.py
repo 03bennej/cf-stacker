@@ -79,8 +79,12 @@ def define_variables(X_shape, latent_dim):
     H = tf.Variable(initializer(shape=[latent_dim, X2],
                                 dtype=tf.dtypes.float32),
                     trainable=True)
-    omega = tf.Variable(tf.zeros([X_shape[1], 1]), name="weight")
-    beta = tf.Variable(tf.zeros([1]), name="bias")
+    omega = tf.Variable(initializer(shape=[X_shape[1], 1],
+                        dtype=tf.dtypes.float32),
+                        trainable=True)
+    beta = tf.Variable(initializer(shape=[1, 1],
+                        dtype=tf.dtypes.float32),
+                        trainable=True)
     return W, H, omega, beta
 
 
@@ -140,6 +144,8 @@ class MatrixFactorizationClassifier(BaseEstimator):
         return self
 
     def predict(self, X):
+        
+        self.max_iter = 600
 
         print("PREDICTING")
 
@@ -151,9 +157,11 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
         self.optimize_test(X_train=self.X_train, X_test=self.X_test)
 
-        self.y_predict = logistic_regression(self.X_test, self.omega, self.beta).numpy()
+        self.y_predict = logistic_regression(self.X_test, self.omega, self.beta).numpy()[:, 0]
 
-        return self.y_predict[:, 0]
+        self.y_predict = np.clip(self.y_predict, 0, 1)
+
+        return self.y_predict
 
     def train_losses(self, X, Xh, y, yh, W, H, omega):
         loss_mf = wmse(X, Xh, self.C_train) + l2_reg(W, self.lam_WH) + l2_reg(H, self.lam_WH)
@@ -247,9 +255,9 @@ if __name__ == "__main__":
     X_test = test_data.drop(["label"], axis=1).to_numpy()
     y_test = test_data.pop("label").to_numpy()
 
-    mf_model = MatrixFactorizationClassifier(latent_dim=5,
-                                             alpha=0.999,
-                                             max_iter=3000,
+    mf_model = MatrixFactorizationClassifier(latent_dim=10,
+                                             alpha=0.99,
+                                             max_iter=2000,
                                              learning_rate=0.001,
                                              tol=0.0000000001,
                                              lam_WH=0.0,

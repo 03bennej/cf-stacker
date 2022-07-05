@@ -200,7 +200,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
         combined_loss, mf_loss, lr_loss = self.train_losses(X_train, self.Xh_train, y, self.yh_train, self.W_train,
                                                             self.H, self.omega)
 
-        print(combined_loss, mf_loss, lr_loss)
+        print(self.omega, self.beta)
 
         while combined_loss > self.tol:
 

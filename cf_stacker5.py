@@ -156,7 +156,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
     def predict(self, X):
         
-        self.max_iter = 500
+        self.max_iter = 250
 
         print("PREDICTING")
 

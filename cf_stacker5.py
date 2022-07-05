@@ -156,7 +156,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
     def predict(self, X):
         
-        self.max_iter = 600
+        self.max_iter = 500
 
         print("PREDICTING")
 
@@ -247,7 +247,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
             step = step + 1
 
-            if step % 100 == 0:
+            if step % 1 == 0:
                 print("epoch: %i, mf_loss: %f" % (step, mf_loss))
 
             if step == self.max_iter:
@@ -267,12 +267,12 @@ if __name__ == "__main__":
     y_test = test_data.pop("label").to_numpy()
 
     mf_model = MatrixFactorizationClassifier(latent_dim=10,
-                                             alpha=0.95,
+                                             alpha=0.9,
                                              max_iter=2000,
                                              learning_rate=0.005,
                                              tol=0.0000000001,
                                              lam_WH=0.0,
-                                             lam_omega=0.1)
+                                             lam_omega=0.5)
     mf_model.fit(X_train, y_train)
     # %%
     y_pred = mf_model.predict(X_test)

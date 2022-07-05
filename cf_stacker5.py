@@ -127,7 +127,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
         self.X_train = tf.constant(X, dtype=tf.dtypes.float32)
 
-        y = np.expand_dims(y, axis=-1)
+        y = tf.constant(np.expand_dims(y, axis=-1), dtype=tf.dtypes.int64)
 
         # self.y = tf.constant(np.expand_dims(y, axis=-1), dtype=tf.dtypes.int32)
 
@@ -249,9 +249,9 @@ if __name__ == "__main__":
     X_test = test_data.drop(["label"], axis=1).to_numpy()
     y_test = test_data.pop("label").to_numpy()
 
-    mf_model = MatrixFactorizationClassifier(latent_dim=10,
-                                             alpha=0.99,
-                                             max_iter=1000,
+    mf_model = MatrixFactorizationClassifier(latent_dim=5,
+                                             alpha=0.999,
+                                             max_iter=3000,
                                              learning_rate=0.001,
                                              tol=0.0000000001,
                                              lam_WH=0.0,

@@ -79,7 +79,7 @@ def define_variables(X_shape, latent_dim):
     H = tf.Variable(initializer(shape=[latent_dim, X2],
                                 dtype=tf.dtypes.float32),
                     trainable=True)
-    omega = tf.Variable(tf.ones([X_shape[1], 1]), name="weight")
+    omega = tf.Variable(tf.zeros([X_shape[1], 1]), name="weight")
     beta = tf.Variable(tf.zeros([1]), name="bias")
     return W, H, omega, beta
 

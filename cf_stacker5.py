@@ -127,7 +127,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
         self.X_train = tf.constant(X, dtype=tf.dtypes.float32)
 
-        y = tf.constant(np.expand_dims(y, axis=-1), dtype=tf.dtypes.float32)
+        y = np.expand_dims(y, axis=-1)
 
         # self.y = tf.constant(np.expand_dims(y, axis=-1), dtype=tf.dtypes.int32)
 
@@ -200,7 +200,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
         combined_loss, mf_loss, lr_loss = self.train_losses(X_train, self.Xh_train, y, self.yh_train, self.W_train,
                                                             self.H, self.omega)
 
-        print(combined_loss)
+        print(combined_loss, mf_loss, lr_loss)
 
         while combined_loss > self.tol:
 

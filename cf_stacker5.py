@@ -206,8 +206,6 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
             step = step + 1
 
-            print(step)
-
             if step % 100 == 0:
                 print(
                     "epoch: %i, combined_loss: %f, mf_loss: %f, lr_loss: %f" % (step, combined_loss, mf_loss, lr_loss))

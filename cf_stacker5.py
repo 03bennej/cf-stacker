@@ -137,9 +137,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
         return self
 
-    def predict(self, X, max_iter_test=50):
-
-        self.max_iter_test = max_iter_test
+    def predict(self, X):
 
         self.X_test = tf.constant(X, dtype=tf.dtypes.float32)
 
@@ -229,7 +227,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
             if step % 100 == 0:
                 print("epoch: %i, mf_loss: %f" % (step, mf_loss))
 
-            if step == self.max_iter_test:
+            if step == self.max_iter:
                 print("Increase max_iter: unable to meet convergence criteria")
                 break
 
@@ -247,14 +245,14 @@ if __name__ == "__main__":
 
     mf_model = MatrixFactorizationClassifier(latent_dim=10,
                                              alpha=0.99,
-                                             max_iter=2000,
+                                             max_iter=1000,
                                              learning_rate=0.001,
                                              tol=0.0000000001,
                                              lam_WH=0.0,
                                              lam_omega=0.0)
     mf_model.fit(X_train, y_train)
     # %%
-    y_pred = mf_model.predict(X_test, max_iter_test=1000)
+    y_pred = mf_model.predict(X_test)
 
     sk_lr = LogisticRegression()
     sk_lr.fit(X_test, y_test)

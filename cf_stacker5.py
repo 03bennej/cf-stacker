@@ -247,7 +247,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
             step = step + 1
 
-            if step % 1 == 0:
+            if step % 100 == 0:
                 print("epoch: %i, mf_loss: %f" % (step, mf_loss))
 
             if step == self.max_iter:

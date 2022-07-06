@@ -169,7 +169,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
         self.optimize_test(X_train=self.X_train, X_test=self.X_test)
 
-        self.y_predict = logistic_regression(self.Xh_test, self.omega, self.beta).numpy()[:, 0]
+        self.y_predict = logistic_regression(self.X_test, self.omega, self.beta).numpy()[:, 0] # should be Xh
 
         return self.y_predict
 

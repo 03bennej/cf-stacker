@@ -91,6 +91,7 @@ def define_variables(X_shape, latent_dim):
     # beta = tf.Variable(tf.convert_to_tensor(np.array([0.5], dtype=np.float32)), dtype=tf.dtypes.float32)
     omega = tf.Variable(tf.zeros([X_shape[1], 1]),
                         dtype=tf.dtypes.float32)
+    print(omega.shape())
     beta = tf.Variable(tf.zeros([1]), dtype=tf.dtypes.float32)
     # omega = tf.Variable(initializer2(shape=[X_shape[1], 1],
     #                     dtype=tf.dtypes.float32),

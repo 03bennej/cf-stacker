@@ -152,7 +152,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
         self.y_predict = np.clip(self.y_predict, 0, 1)
 
-        return self.y_predict
+        return self.y_predict[:, 0]
 
     def train_losses(self, X, Xh, y, yh, W, H):
         loss_mf = wmse(X, Xh, self.C_train) + l2_reg(W, self.lam_WH) + l2_reg(H, self.lam_WH)

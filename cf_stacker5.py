@@ -180,25 +180,10 @@ class MatrixFactorizationClassifier(BaseEstimator):
         return self.alpha * (wmse(X, Xh, C) + l2_reg(W, self.lam_WH) + l2_reg(H, self.lam_WH))
 
 
-    def optimization_train_step0(self, X_train, y):
-        with tf.GradientTape() as tape:
-            self.Xh_train = model(self.W_train, self.H, self.mu_train, self.bw_train, self.bh_train)
-            self.yh_train = format_lr(logistic_regression(self.Xh_train, self.omega, self.beta))
-            self.C_train = calc_C(X_train, self.yh_train)
-            combined_loss, mf_loss, lr_loss = self.train_losses(X_train, self.Xh_train, y, self.yh_train, self.W_train,
-                                                                self.H, self.omega)
-
-        gradients = tape.gradient(combined_loss, [self.W_train, self.H])
-
-        self.optimizer.apply_gradients(zip(gradients, [self.W_train, self.H]))
-
-        return combined_loss, mf_loss, lr_loss
-
-
     def optimization_train_step(self, X_train, y):
         with tf.GradientTape() as tape:
             self.Xh_train = model(self.W_train, self.H, self.mu_train, self.bw_train, self.bh_train)
-            self.yh_train = format_lr(logistic_regression(self.Xh_train, self.omega, self.beta))
+            self.yh_train = logistic_regression(self.Xh_train, self.omega, self.beta)
             self.C_train = calc_C(X_train, self.yh_train)
             combined_loss, mf_loss, lr_loss = self.train_losses(X_train, self.Xh_train, y, self.yh_train, self.W_train,
                                                                 self.H, self.omega)
@@ -209,10 +194,11 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
         return combined_loss, mf_loss, lr_loss
 
+
     def optimization_test_step(self, X_train, X_test):
         with tf.GradientTape() as tape:
             self.Xh_test = model(self.W_test, self.H, self.mu_test, self.bw_test, self.bh_test)
-            self.yh_test = format_lr(logistic_regression(self.Xh_test, self.omega, self.beta))
+            self.yh_test = logistic_regression(self.Xh_test, self.omega, self.beta)
             self.C_test = calc_C(X_test, self.yh_test)
             mf_loss = self.test_loss(X_train, self.Xh_train, self.yh_train, self.W_train, self.H, self.C_train) \
                       + self.test_loss(X_test, self.Xh_test, self.yh_test, self.W_test, self.H, self.C_test)
@@ -230,19 +216,6 @@ class MatrixFactorizationClassifier(BaseEstimator):
         self.C_train = calc_C(X_train, self.yh_train)
         combined_loss, mf_loss, lr_loss = self.train_losses(X_train, self.Xh_train, y, self.yh_train, self.W_train,
                                                             self.H, self.omega)
-
-        # while combined_loss > self.tol:
-
-        #     combined_loss, mf_loss, lr_loss = self.optimization_train_step0(X_train, y)
-
-        #     step = step + 1
-
-        #     if step % 100 == 0:
-        #         print("epoch: %i, combined_loss: %f, mf_loss: %f, lr_loss: %f" % (step, combined_loss, mf_loss, lr_loss))
-
-        #     if step == 100:
-        #         print("Increase max_iter: unable to meet convergence criteria")
-        #         break 
 
         while combined_loss > self.tol:
 

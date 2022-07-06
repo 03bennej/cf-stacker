@@ -169,7 +169,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
         self.optimize_test(X_train=self.X_train, X_test=self.X_test)
 
-        self.y_predict = logistic_regression(self.Xh_test, self.omega, self.beta).numpy()[:, 0] # should be Xh
+        self.y_predict = logistic_regression(self.Xh_test, self.omega, self.beta).numpy()[:, 0]
 
         return self.y_predict
 
@@ -188,7 +188,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
     def optimization_train_step(self, X_train, y):
         with tf.GradientTape() as tape:
             self.Xh_train = model(self.W_train, self.H, self.mu_train, self.bw_train, self.bh_train)
-            self.yh_train = logistic_regression(self.X_train, self.omega, self.beta) # should be Xh
+            self.yh_train = logistic_regression(self.Xh_train, self.omega, self.beta)
             self.C_train = calc_C(X_train, self.yh_train)
             combined_loss, mf_loss, lr_loss = self.train_losses(X_train, self.Xh_train, y, self.yh_train, self.W_train,
                                                                 self.H, self.omega)
@@ -203,7 +203,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
     def optimization_test_step(self, X_train, X_test):
         with tf.GradientTape() as tape:
             self.Xh_test = model(self.W_test, self.H, self.mu_test, self.bw_test, self.bh_test)
-            self.yh_test = logistic_regression(self.X_test, self.omega, self.beta) # should be Xh
+            self.yh_test = logistic_regression(self.Xh_test, self.omega, self.beta)
             self.C_test = calc_C(X_test, self.yh_test)
             mf_loss = self.test_loss(X_train, self.Xh_train, self.yh_train, self.W_train, self.H, self.C_train) \
                       + self.test_loss(X_test, self.Xh_test, self.yh_test, self.W_test, self.H, self.C_test)
@@ -217,7 +217,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
     def optimize_train(self, X_train, y):
         step = 0
         self.Xh_train = model(self.W_train, self.H, self.mu_train, self.bw_train, self.bh_train)
-        self.yh_train = format_lr(logistic_regression(self.X_train, self.omega, self.beta)) # should be Xh
+        self.yh_train = format_lr(logistic_regression(self.Xh_train, self.omega, self.beta))
         self.C_train = calc_C(X_train, self.yh_train)
         combined_loss, mf_loss, lr_loss = self.train_losses(X_train, self.Xh_train, y, self.yh_train, self.W_train,
                                                             self.H, self.omega)

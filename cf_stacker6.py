@@ -61,7 +61,9 @@ def mean(X):
 def bce_loss(y_true, y_pred):
     y_pred = tf.clip_by_value(y_pred, 1e-9, 1.)
     
-    neg_pos_ratio = np.count_nonzero(y_true) / np.count_nonzero(y_true) 
+    neg_pos_ratio = np.count_nonzero(y_true) / np.count_nonzero(y_true)
+
+    print(tf.minimum(y_pred), tf.maximum(y_pred))
 
     bce = -tf.reduce_mean(neg_pos_ratio * y_true * tf.math.log(y_pred) + (1 - y_true) * tf.math.log(1 - y_pred)) / neg_pos_ratio
 

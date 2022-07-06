@@ -114,8 +114,8 @@ def calculate_biases(X):
 
 
 def calc_C(X, y):  # return binary matrix
-    # return tf.math.floor(1 - tf.math.abs(X - y) + 1 / 2)
-    return 1 - tf.math.abs(X - y)
+    return tf.math.floor(1 - tf.math.abs(X - y) + 1 / 2)
+    # return 1 - tf.math.abs(X - y)
 
 
 class MatrixFactorizationClassifier(BaseEstimator):

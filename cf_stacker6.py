@@ -53,7 +53,9 @@ def model(W, H, mu, bw, bh):
 
 
 def mean(X):
-    return tf.reduce_mean(X, axis=1, keepdims=True)
+    mean = tf.reduce_mean(X, axis=1, keepdims=True)
+    tf.clip_by_value(mean, 1e-9, 1)
+    return mean
 
 
 def bce_loss(y_true, y_pred):

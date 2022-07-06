@@ -56,7 +56,6 @@ def mean(X):
     return tf.reduce_mean(X, axis=1, keepdims=True)
 
 
-
 def bce_loss(y_true, y_pred):
     y_pred = tf.clip_by_value(y_pred, 1e-5, 1 - 1e-5)
     
@@ -96,8 +95,8 @@ def calculate_biases(X):
 
 
 def calc_C(X, y):  # return binary matrix
-    return tf.math.floor(1 - tf.math.abs(X - y) + 1 / 2)
-    # return 1 - tf.math.abs(X - y)
+    # return tf.math.floor(1 - tf.math.abs(X - y) + 1 / 2)
+    return 1 - tf.math.abs(X - y)
 
 
 class MatrixFactorizationClassifier(BaseEstimator):

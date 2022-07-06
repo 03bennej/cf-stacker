@@ -197,8 +197,6 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
         self.optimizer.apply_gradients(zip(gradients, [self.W_train, self.H]))
 
-        gradients = tape.gradient(combined_loss, [self.omega, self.beta])
-
         self.optimizer.apply_gradients(zip(gradients, [self.omega, self.beta]))
 
         return combined_loss, mf_loss, lr_loss

@@ -49,7 +49,7 @@ def l2_reg(U, lam):
 
 
 def model(W, H, mu, bw, bh):
-    return tf.linalg.matmul(W, H) #+ mu + bw + bh
+    return tf.linalg.matmul(W, H) + mu + bw + bh
 
 
 def mean(X):

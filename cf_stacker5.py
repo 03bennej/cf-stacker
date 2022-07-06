@@ -189,9 +189,31 @@ class MatrixFactorizationClassifier(BaseEstimator):
             combined_loss, mf_loss, lr_loss = self.train_losses(X_train, self.Xh_train, y, self.yh_train, self.W_train,
                                                                 self.H, self.omega)
 
+        gradients = tape.gradient(combined_loss, [self.W_train])
+
+        self.optimizer.apply_gradients(zip(gradients, [self.W_train]))
+
+        with tf.GradientTape() as tape:
+            self.Xh_train = model(self.W_train, self.H, self.mu_train, self.bw_train, self.bh_train)
+            self.yh_train = format_lr(logistic_regression(self.Xh_train, self.omega, self.beta))
+            self.C_train = calc_C(X_train, self.yh_train)
+            combined_loss, mf_loss, lr_loss = self.train_losses(X_train, self.Xh_train, y, self.yh_train, self.W_train,
+                                                                self.H, self.omega)
+
         gradients = tape.gradient(combined_loss, [self.W_train, self.H, self.omega, self.beta])
 
-        self.optimizer.apply_gradients(zip(gradients, [self.W_train, self.H, self.omega, self.beta]))
+        self.optimizer.apply_gradients(zip(gradients, [self.H]))
+
+        with tf.GradientTape() as tape:
+            self.Xh_train = model(self.W_train, self.H, self.mu_train, self.bw_train, self.bh_train)
+            self.yh_train = format_lr(logistic_regression(self.Xh_train, self.omega, self.beta))
+            self.C_train = calc_C(X_train, self.yh_train)
+            combined_loss, mf_loss, lr_loss = self.train_losses(X_train, self.Xh_train, y, self.yh_train, self.W_train,
+                                                                self.H, self.omega)
+
+        gradients = tape.gradient(combined_loss, [self.omega, self.beta])
+
+        self.optimizer.apply_gradients(zip(gradients, [self.omega, self.beta]))
 
         return combined_loss, mf_loss, lr_loss
 

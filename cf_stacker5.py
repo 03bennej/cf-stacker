@@ -92,7 +92,6 @@ def define_variables(X_shape, latent_dim):
     omega = tf.Variable(tf.zeros([X_shape[1], 1]),
                         dtype=tf.dtypes.float32,
                         trainable=True)
-    print(omega.shape)
     beta = tf.Variable(tf.zeros([1]), dtype=tf.dtypes.float32, trainable=True)
     # omega = tf.Variable(initializer2(shape=[X_shape[1], 1],
     #                     dtype=tf.dtypes.float32),
@@ -101,20 +100,6 @@ def define_variables(X_shape, latent_dim):
     #                     dtype=tf.dtypes.float32),
     #                     trainable=True)
     return W, H, omega, beta
-
-
-def define_variables_test(X_shape, latent_dim):
-    initializer1 = keras.initializers.RandomUniform(minval=-0.01,
-                                                   maxval=0.01,
-                                                   seed=None)
-    # initializer2 = keras.initializers.RandomUniform(minval=1.01,
-    #                                                maxval=0.99,
-    #                                                seed=None)
-    X1, X2 = X_shape
-    W_test = tf.Variable(initializer1(shape=[X1, latent_dim],
-                                dtype=tf.dtypes.float32),
-                    trainable=True)
-    return W_test
 
 
 def calculate_biases(X):
@@ -178,7 +163,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
         self.X_test = tf.constant(X, dtype=tf.dtypes.float32)
 
-        self.W_test = define_variables_test(np.shape(X), self.latent_dim)
+        self.W_test, _, _, _ = define_variables(np.shape(X), self.latent_dim)
 
         self.mu_test, self.bw_test, self.bh_test = calculate_biases(X)
 

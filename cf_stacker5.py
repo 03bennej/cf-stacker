@@ -278,7 +278,7 @@ if __name__ == "__main__":
     y_test = test_data.pop("label").to_numpy()
 
     mf_model = MatrixFactorizationClassifier(latent_dim=10,
-                                             alpha=0.95,
+                                             alpha=0.1,
                                              max_iter=3000,
                                              learning_rate=0.001,
                                              tol=0.0000000001,

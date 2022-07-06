@@ -54,7 +54,7 @@ def model(W, H, mu, bw, bh):
 
 def mean(X):
     mean = tf.reduce_mean(X, axis=1, keepdims=True)
-    tf.clip_by_value(mean, 1e-9, 1)
+    tf.clip_by_value(mean, 1e-9, 1 - 1e-9)
     return mean
 
 

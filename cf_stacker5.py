@@ -165,8 +165,6 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
         self.W_test, _, _, _ = define_variables(np.shape(X), self.latent_dim)
 
-        print(self.omega)
-
         self.mu_test, self.bw_test, self.bh_test = calculate_biases(X)
 
         self.optimize_test(X_train=self.X_train, X_test=self.X_test)
@@ -175,11 +173,13 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
         return self.y_predict
 
+
     def train_losses(self, X, Xh, y, yh, W, H, omega):
         loss_mf = wmse(X, Xh, self.C_train) + l2_reg(W, self.lam_WH) + l2_reg(H, self.lam_WH)
         loss_lr = bce_loss(y, yh) + l2_reg(omega, self.lam_omega)
         combined_loss = self.alpha * loss_mf + (1 - self.alpha) * loss_lr
         return combined_loss, self.alpha * loss_mf, (1 - self.alpha) * loss_lr
+
 
     def test_loss(self, X, Xh, yh, W, H, C):
         return self.alpha * (wmse(X, Xh, C) + l2_reg(W, self.lam_WH) + l2_reg(H, self.lam_WH))
@@ -188,7 +188,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
     def optimization_train_step(self, X_train, y):
         with tf.GradientTape() as tape:
             self.Xh_train = model(self.W_train, self.H, self.mu_train, self.bw_train, self.bh_train)
-            self.yh_train = logistic_regression(self.Xh_train, self.omega, self.beta)
+            self.yh_train = logistic_regression(self.X_train, self.omega, self.beta) # should be Xh
             self.C_train = calc_C(X_train, self.yh_train)
             combined_loss, mf_loss, lr_loss = self.train_losses(X_train, self.Xh_train, y, self.yh_train, self.W_train,
                                                                 self.H, self.omega)
@@ -203,7 +203,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
     def optimization_test_step(self, X_train, X_test):
         with tf.GradientTape() as tape:
             self.Xh_test = model(self.W_test, self.H, self.mu_test, self.bw_test, self.bh_test)
-            self.yh_test = logistic_regression(self.Xh_test, self.omega, self.beta)
+            self.yh_test = logistic_regression(self.X_test, self.omega, self.beta)
             self.C_test = calc_C(X_test, self.yh_test)
             mf_loss = self.test_loss(X_train, self.Xh_train, self.yh_train, self.W_train, self.H, self.C_train) \
                       + self.test_loss(X_test, self.Xh_test, self.yh_test, self.W_test, self.H, self.C_test)
@@ -217,7 +217,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
     def optimize_train(self, X_train, y):
         step = 0
         self.Xh_train = model(self.W_train, self.H, self.mu_train, self.bw_train, self.bh_train)
-        self.yh_train = format_lr(logistic_regression(self.Xh_train, self.omega, self.beta))
+        self.yh_train = format_lr(logistic_regression(self.X_train, self.omega, self.beta)) # should be Xh
         self.C_train = calc_C(X_train, self.yh_train)
         combined_loss, mf_loss, lr_loss = self.train_losses(X_train, self.Xh_train, y, self.yh_train, self.W_train,
                                                             self.H, self.omega)

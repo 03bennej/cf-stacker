@@ -61,7 +61,7 @@ def format_lr(yh):
 
 
 def bce_loss(y_true, y_pred):
-    y_pred = tf.clip_by_value(y_pred, 1e-6, 1 - 1e-6)
+    # y_pred = tf.clip_by_value(y_pred, 1e-6, 1 - 1e-6)
     
     neg_pos_ratio = np.count_nonzero(y_true) / np.count_nonzero(y_true) 
 

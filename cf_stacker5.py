@@ -223,6 +223,8 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
             combined_loss, mf_loss, lr_loss = self.optimization_train_step(X_train, y)
 
+            print(self.omega.numpy())
+
             step = step + 1
 
             if step % 100 == 0:

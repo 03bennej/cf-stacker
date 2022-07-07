@@ -166,7 +166,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
         self.W_test, _, _, _ = define_variables(np.shape(X), self.latent_dim)
 
-        self.mu_test, self.bw_test, self.bh_test = calculate_biases(X)
+        _, self.bw_test, _ = calculate_biases(X)
 
         self.optimize_test(X_train=self.X_train, X_test=self.X_test)
 

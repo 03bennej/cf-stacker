@@ -103,9 +103,13 @@ def define_variables(X_shape, latent_dim):
     return W, H, omega, beta
 
 
-def calc_C(X, y):  # return binary matrix
-    return tf.math.floor(1 - tf.math.abs(X - y) + 1 / 2)
-    # return 1 - tf.math.abs(X - y)
+def calc_C(X, y, numpy=False):  # return binary matrix
+    # C = 1 - tf.math.abs(X - y)
+    C = tf.math.floor(1 - tf.math.abs(X - y) + 1 / 2)
+    if numpy:
+        C = C.numpy()
+    return C
+
 
 
 def calculate_biases(X, y):
@@ -155,7 +159,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
         self.W_train, self.H, self.omega, self.beta = define_variables(np.shape(X), self.latent_dim)
 
-        self.mu_train, self.bw_train, self.bh_train = calculate_biases(self.X_train, y=y)
+        self.mu_train, self.bw_train, self.bh_train = calculate_biases(X, y=y, numpy=True)
 
         self.optimize_train(X_train=self.X_train, y=y)
 

@@ -49,7 +49,7 @@ def l2_reg(U, lam):
 
 
 def model(W, H, mu, bw, bh):
-    return tf.linalg.matmul(W, H) #+ mu + bw + bh
+    return tf.linalg.matmul(W, H) + mu + bw + bh
 
 
 def logistic_regression(X, omega, beta):
@@ -90,7 +90,7 @@ def define_variables(X_shape, latent_dim):
     # omega = tf.Variable(tf.zeros([X_shape[1], 1]),
     #                     dtype=tf.dtypes.float32)
     # beta = tf.Variable(tf.convert_to_tensor(np.array([0.5], dtype=np.float32)), dtype=tf.dtypes.float32)
-    omega = tf.Variable(tf.ones([X_shape[1], 1]),
+    omega = tf.Variable(tf.zeros([X_shape[1], 1]),
                         dtype=tf.dtypes.float32,
                         trainable=True)
     beta = tf.Variable(tf.zeros([1]), dtype=tf.dtypes.float32, trainable=True)

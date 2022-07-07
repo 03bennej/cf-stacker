@@ -142,7 +142,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
         self.X_test = tf.constant(X, dtype=tf.dtypes.float32)
 
-        self.W_test, _= define_variables(np.shape(X), self.latent_dim)
+        self.W_test, _ = define_variables(np.shape(X), self.latent_dim)
 
         self.mu_test, self.bw_test, self.bh_test = calculate_biases(X)
 

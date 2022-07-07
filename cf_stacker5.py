@@ -169,8 +169,12 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
         print("PREDICTING")
 
-        muw_test = np.expand_dims(np.mean(X, axis=1), axis=1)
-        self.bw_test = tf.constant(muw_test - self.mu_train, dtype=tf.dtypes.float32)
+        y_predict_naive = logistic_regression(X, self.omega, self.beta).numpy()[:, 0]
+
+        _, self.bw_test, _ = calculate_biases(X, y_predict_naive)
+
+        # muw_test = np.expand_dims(np.mean(X, axis=1), axis=1)
+        # self.bw_test = tf.constant(muw_test - self.mu_train, dtype=tf.dtypes.float32)
 
         self.X_test = tf.constant(X, dtype=tf.dtypes.float32)
 

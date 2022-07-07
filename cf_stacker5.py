@@ -108,26 +108,17 @@ def calc_C(X, y):  # return binary matrix
     # return 1 - tf.math.abs(X - y)
 
 
-def calculate_biases(X, y=None):
-    if y is None:
-        mu = np.mean(X)
-        muw = np.expand_dims(np.mean(X, axis=1), axis=1)
-        muh = np.expand_dims(np.mean(X, axis=0), axis=0)
+def calculate_biases(X, y):
+    C = calc_C(X, y)
+    X_new = X * C
+    X_new[X_new == 0] = np.nan
+    mu = np.nanmean(X)
+    muw = np.expand_dims(np.nanmean(X, axis=1), axis=1)
+    muh = np.expand_dims(np.nanmean(X, axis=0), axis=0)
 
-        mu = tf.constant(mu, dtype=tf.dtypes.float32)
-        bw = tf.constant(muw - mu, dtype=tf.dtypes.float32)
-        bh = tf.constant(muh - mu, dtype=tf.dtypes.float32)
-    else:
-        C = calc_C(X, y)
-        X_new = X * C
-        X_new[X_new == 0] = np.nan
-        mu = np.nanmean(X)
-        muw = np.expand_dims(np.nanmean(X, axis=1), axis=1)
-        muh = np.expand_dims(np.nanmean(X, axis=0), axis=0)
-
-        mu = tf.constant(mu, dtype=tf.dtypes.float32)
-        bw = tf.constant(muw - mu, dtype=tf.dtypes.float32)
-        bh = tf.constant(muh - mu, dtype=tf.dtypes.float32)
+    mu = tf.constant(mu, dtype=tf.dtypes.float32)
+    bw = tf.constant(muw - mu, dtype=tf.dtypes.float32)
+    bh = tf.constant(muh - mu, dtype=tf.dtypes.float32)
     return mu, bw, bh
 
 
@@ -173,6 +164,9 @@ class MatrixFactorizationClassifier(BaseEstimator):
     def predict(self, X):
 
         print("PREDICTING")
+
+        muw = np.expand_dims(np.mean(X, axis=1), axis=1)
+        bw = tf.constant(muw - self.mu, dtype=tf.dtypes.float32)
 
         self.X_test = tf.constant(X, dtype=tf.dtypes.float32)
 

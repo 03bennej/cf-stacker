@@ -170,7 +170,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
         print("PREDICTING")
 
         muw = np.expand_dims(np.mean(X, axis=1), axis=1)
-        bw = tf.constant(muw - self.mu, dtype=tf.dtypes.float32)
+        bw = tf.constant(muw - self.mu_train, dtype=tf.dtypes.float32)
 
         self.X_test = tf.constant(X, dtype=tf.dtypes.float32)
 

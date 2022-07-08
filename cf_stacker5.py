@@ -174,7 +174,9 @@ class MatrixFactorizationClassifier(BaseEstimator):
         # _, self.bw_test, _ = calculate_biases(X, y_predict_naive)
 
         muw_test = np.expand_dims(np.mean(X, axis=1), axis=1)
-        self.bw_test = 0#tf.constant(muw_test - self.mu_train, dtype=tf.dtypes.float32)
+        self.bw_test = tf.Variable(muw_test - self.mu_train,
+                                   dtype=tf.dtypes.float32,
+                                   trainable=True)
 
         self.X_test = tf.constant(X, dtype=tf.dtypes.float32)
 
@@ -230,9 +232,9 @@ class MatrixFactorizationClassifier(BaseEstimator):
             mf_loss = self.test_loss(X_train, self.Xh_train, self.yh_train, self.W_train, self.H, self.C_train) \
                       + self.test_loss(X_test, self.Xh_test, self.yh_test, self.W_test, self.H, self.C_test)
 
-        gradients = tape.gradient(mf_loss, [self.W_test])
+        gradients = tape.gradient(mf_loss, [self.W_test, self.bw_test])
 
-        self.optimizer.apply_gradients(zip(gradients, [self.W_test]))
+        self.optimizer.apply_gradients(zip(gradients, [self.W_test, self.bw_test]))
 
         return mf_loss
 

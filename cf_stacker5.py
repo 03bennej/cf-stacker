@@ -180,8 +180,6 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
         self.W_test, _, _, _ = define_variables(np.shape(X), self.latent_dim)
 
-        # _, self.bw_test, _ = calculate_biases(X)
-
         self.optimize_test(X_train=self.X_train, X_test=self.X_test)
 
         self.y_predict = logistic_regression(self.Xh_test, self.omega, self.beta).numpy()[:, 0]

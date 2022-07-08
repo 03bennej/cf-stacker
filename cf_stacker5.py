@@ -104,8 +104,8 @@ def define_variables(X_shape, latent_dim):
 
 
 def calc_C(X, y, numpy=False):  # return binary matrix
-    # C = 1 - tf.math.abs(X - y)
-    C = tf.math.floor(1 - tf.math.abs(X - y) + 1 / 2)
+    C = 1 - tf.math.abs(X - y)
+    # C = tf.math.floor(1 - tf.math.abs(X - y) + 1 / 2)
     if numpy:
         C = C.numpy()
     return C

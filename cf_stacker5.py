@@ -210,7 +210,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
         gradients = tape.gradient(mf_loss, [self.W_train, self.H])
 
-        self.optimizer.apply_gradients(zip(gradients, [self.W_train, self.H, self.omega, self.beta]))
+        self.optimizer.apply_gradients(zip(gradients, [self.W_train, self.H]))
 
         with tf.GradientTape() as tape:
             self.Xh_train = model(self.W_train, self.H, self.mu_train, self.bw_train, self.bh_train)

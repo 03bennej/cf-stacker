@@ -235,7 +235,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
             if step < 20:
                 self.C_test = 1
             else:
-                self.C_test = calc_C(X_train, self.yh_train)
+                self.C_test = calc_C(X_test, self.yh_test)
             mf_loss = self.test_loss(X_train, self.Xh_train, self.yh_train, self.W_train, self.H, self.C_train) \
                       + self.test_loss(X_test, self.Xh_test, self.yh_test, self.W_test, self.H, self.C_test)
 
@@ -277,7 +277,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
         if step < 20:
             self.C_test = 1
         else:
-            self.C_test = calc_C(X_train, self.yh_train)
+            self.C_test = calc_C(X_test, self.yh_test)
         mf_loss = self.test_loss(X_train, self.Xh_train, self.yh_train, self.W_train, self.H, self.C_train) \
                   + self.test_loss(X_test, self.Xh_test, self.yh_test, self.W_test, self.H, self.C_test)
 

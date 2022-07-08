@@ -174,8 +174,8 @@ class MatrixFactorizationClassifier(BaseEstimator):
         # _, self.bw_test, _ = calculate_biases(X, y_predict_naive)
 
         self.muw_test = tf.Variable(np.expand_dims(np.mean(X, axis=1), axis=1),
-                               dtype=tf.dtypes.float32,
-                               trainable=True)
+                                    dtype=tf.dtypes.float32,
+                                    trainable=True)
         self.bw_test = self.muw_test - self.mu_train
 
         self.X_test = tf.constant(X, dtype=tf.dtypes.float32)

@@ -195,7 +195,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
     def test_loss(self, X, Xh, yh, W, H, C):
         return self.alpha * (wmse(X, Xh, C) + l2_reg(W, self.lam_WH) + l2_reg(H, self.lam_WH)) \
-               + l2_reg(self.bw_test, self.lam_WH) + l2_reg(self.bh_test, self.lam_WH)
+               + l2_reg(self.bw_test, self.lam_WH) + l2_reg(self.bh_train, self.lam_WH)
 
     def optimization_train_step(self, X_train, y):
         with tf.GradientTape() as tape:

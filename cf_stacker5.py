@@ -173,10 +173,8 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
         # _, self.bw_test, _ = calculate_biases(X, y_predict_naive)
 
-        self.muw_test = tf.Variable(np.expand_dims(np.mean(X, axis=1), axis=1),
-                                    dtype=tf.dtypes.float32,
-                                    trainable=True)
-        self.bw_test = self.muw_test - self.mu_train
+        muw_test = np.expand_dims(np.mean(X, axis=1), axis=1)
+        self.bw_test = tf.constant(muw_test - self.mu_train, dtype=tf.dtypes.float32)
 
         self.X_test = tf.constant(X, dtype=tf.dtypes.float32)
 
@@ -226,15 +224,15 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
     def optimization_test_step(self, X_train, X_test):
         with tf.GradientTape() as tape:
-            self.Xh_test = model(self.W_test, self.H, self.mu_train, self.muw_test - self.mu_train, self.bh_train)
+            self.Xh_test = model(self.W_test, self.H, self.mu_train, self.bw_test, self.bh_train)
             self.yh_test = logistic_regression(self.Xh_test, self.omega, self.beta)
             self.C_test = calc_C(X_test, self.yh_test)
             mf_loss = self.test_loss(X_train, self.Xh_train, self.yh_train, self.W_train, self.H, self.C_train) \
                       + self.test_loss(X_test, self.Xh_test, self.yh_test, self.W_test, self.H, self.C_test)
 
-        gradients = tape.gradient(mf_loss, [self.W_test, self.muw_test])
+        gradients = tape.gradient(mf_loss, [self.W_test])
 
-        self.optimizer.apply_gradients(zip(gradients, [self.W_test, self.muw_test]))
+        self.optimizer.apply_gradients(zip(gradients, [self.W_test]))
 
         return mf_loss
 
@@ -262,7 +260,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
     def optimize_test(self, X_train, X_test):
         step = 0
-        self.Xh_test = model(self.W_test, self.H, self.mu_train, self.muw_test - self.mu_train, self.bh_train)
+        self.Xh_test = model(self.W_test, self.H, self.mu_train, self.bw_test, self.bh_train)
         self.yh_test = format_lr(logistic_regression(self.X_test, self.omega, self.beta))  # should be Xh
         self.C_test = calc_C(X_test, self.yh_test)
         mf_loss = self.test_loss(X_train, self.Xh_train, self.yh_train, self.W_train, self.H, self.C_train) \

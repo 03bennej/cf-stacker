@@ -197,6 +197,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
                + l2_reg(self.bw_test, self.lam_WH) + l2_reg(self.bh_train, self.lam_WH)
 
     def optimization_train_step(self, X_train, y):
+
         with tf.GradientTape() as tape:
             self.Xh_train = model(self.W_train, self.H, self.mu_train, self.bw_train, self.bh_train)
             self.yh_train = logistic_regression(self.Xh_train, self.omega, self.beta)
@@ -208,16 +209,17 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
         self.optimizer.apply_gradients(zip(gradients, [self.W_train, self.H]))
 
-        with tf.GradientTape() as tape:
-            self.Xh_train = model(self.W_train, self.H, self.mu_train, self.bw_train, self.bh_train)
-            self.yh_train = logistic_regression(self.Xh_train, self.omega, self.beta)
-            self.C_train = calc_C(X_train, self.yh_train)
-            combined_loss, mf_loss, lr_loss = self.train_losses(X_train, self.Xh_train, y, self.yh_train, self.W_train,
-                                                                self.H, self.omega)
+        for i in range(10):
+            with tf.GradientTape() as tape:
+                self.Xh_train = model(self.W_train, self.H, self.mu_train, self.bw_train, self.bh_train)
+                self.yh_train = logistic_regression(self.Xh_train, self.omega, self.beta)
+                self.C_train = calc_C(X_train, self.yh_train)
+                combined_loss, mf_loss, lr_loss = self.train_losses(X_train, self.Xh_train, y, self.yh_train, self.W_train,
+                                                                    self.H, self.omega)
 
-        gradients = tape.gradient(lr_loss, [self.omega, self.beta])
+            gradients = tape.gradient(lr_loss, [self.omega, self.beta])
 
-        self.optimizer.apply_gradients(zip(gradients, [self.omega, self.beta]))
+            self.optimizer.apply_gradients(zip(gradients, [self.omega, self.beta]))
 
         return combined_loss, mf_loss, lr_loss
 
@@ -274,7 +276,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
             if step % 100 == 0:
                 print("epoch: %i, mf_loss: %f" % (step, mf_loss))
 
-            if step == self.max_iter:
+            if step == self.max_iter//4:
                 print("Increase max_iter: unable to meet convergence criteria")
                 break
 

@@ -76,8 +76,8 @@ def bce_loss(y_true, y_pred):
 
 
 def define_variables(X_shape, latent_dim):
-    initializer1 = keras.initializers.RandomUniform(minval=-0.01,
-                                                    maxval=0.01,
+    initializer1 = keras.initializers.RandomUniform(minval=-0.1,
+                                                    maxval=0.1,
                                                     seed=None)
     # initializer2 = keras.initializers.RandomUniform(minval=1.01,
     #                                                maxval=0.99,

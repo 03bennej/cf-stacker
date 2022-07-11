@@ -49,7 +49,7 @@ def l2_reg(U, lam):
 
 
 def model(W, H, mu, bw, bh):
-    X_new = tf.linalg.matmul(W, H) + mu + bw + bh
+    X_new = tf.linalg.matmul(W, H) #+ mu + bw + bh
     X_new = tf.clip_by_value(X_new, 0, 1)
     return X_new
 

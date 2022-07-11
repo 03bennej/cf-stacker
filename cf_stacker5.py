@@ -150,7 +150,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
         lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
             initial_learning_rate,
             decay_steps=100000,
-            decay_rate=0.5,
+            decay_rate=0.99,
             staircase=True)
         self.optimizer = keras.optimizers.SGD(lr_schedule)
         # self.optimizer = keras.optimizers.SGD(self.learning_rate)

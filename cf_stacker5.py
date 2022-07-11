@@ -146,7 +146,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
         self.learning_rate = learning_rate
         self.method = method
 
-        self.optimizer = keras.optimizers.RMSprop(self.learning_rate)
+        self.optimizer = keras.optimizers.SGD(self.learning_rate)
 
     def fit(self, X, y):
 

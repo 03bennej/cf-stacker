@@ -49,7 +49,7 @@ def l2_reg(U, lam):
 
 
 def model(W, H, mu, bw, bh):
-    X_new = tf.linalg.matmul(W, H) #+ mu + bw + bh
+    X_new = tf.linalg.matmul(W, H) + mu + bw + bh
     X_new = tf.clip_by_value(X_new, 0, 1)
     return X_new
 
@@ -76,17 +76,14 @@ def bce_loss(y_true, y_pred):
 
 
 def define_variables(X_shape, latent_dim):
-    initializer1 = keras.initializers.RandomUniform(minval=-0.01,
+    initializer = keras.initializers.RandomUniform(minval=-0.01,
                                                     maxval=0.01,
                                                     seed=None)
-    # initializer2 = keras.initializers.RandomUniform(minval=1.01,
-    #                                                maxval=0.99,
-    #                                                seed=None)
     X1, X2 = X_shape
-    W = tf.Variable(initializer1(shape=[X1, latent_dim],
+    W = tf.Variable(initializer(shape=[X1, latent_dim],
                                  dtype=tf.dtypes.float32),
                     trainable=True)
-    H = tf.Variable(initializer1(shape=[latent_dim, X2],
+    H = tf.Variable(initializer(shape=[latent_dim, X2],
                                  dtype=tf.dtypes.float32),
                     trainable=True)
     omega = tf.Variable(tf.zeros([X_shape[1], 1]),
@@ -105,7 +102,6 @@ def calc_C(X, y, numpy=False):  # return binary matrix
     return C
 
 
-
 def calculate_biases(X, y):
     C = calc_C(X, y, numpy=True)
     X_new = X * C
@@ -115,8 +111,8 @@ def calculate_biases(X, y):
     muh = np.expand_dims(np.nanmean(X, axis=0), axis=0)
 
     mu = tf.constant(mu, dtype=tf.dtypes.float32)
-    bw = tf.constant(muw - mu, dtype=tf.dtypes.float32)
-    bh = tf.constant(muh - mu, dtype=tf.dtypes.float32)
+    bw = tf.Variable(muw - mu, dtype=tf.dtypes.float32, trainable=True)
+    bh = tf.Variable(muh - mu, dtype=tf.dtypes.float32, trainable=True)
     return mu, bw, bh
 
 
@@ -183,7 +179,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
         return combined_loss, self.alpha * loss_mf, (1 - self.alpha) * loss_lr
 
     def test_loss(self, X, Xh, yh, W, H, C):
-        return self.alpha * (wmse(X, Xh, C) + l2_reg(W, self.lam_WH) + l2_reg(H, self.lam_WH)) \
+        return self.alpha * wmse(X, Xh, C) + l2_reg(W, self.lam_WH) + l2_reg(H, self.lam_WH) \
                + l2_reg(self.bw_test, self.lam_WH) + l2_reg(self.bh_train, self.lam_WH)
 
     def optimization_train_step(self, X_train, y):
@@ -195,9 +191,9 @@ class MatrixFactorizationClassifier(BaseEstimator):
             combined_loss, mf_loss, lr_loss = self.train_losses(X_train, self.Xh_train, y, self.yh_train, self.W_train,
                                                                 self.H, self.omega)
 
-        gradients = tape.gradient(mf_loss, [self.W_train, self.H])
+        gradients = tape.gradient(mf_loss, [self.W_train, self.H, self.bw_train, self.bh_train])
 
-        self.optimizer.apply_gradients(zip(gradients, [self.W_train, self.H]))
+        self.optimizer.apply_gradients(zip(gradients, [self.W_train, self.H, self.bw_train, self.bh_train]))
 
         with tf.GradientTape() as tape:
             self.Xh_train = model(self.W_train, self.H, self.mu_train, self.bw_train, self.bh_train)

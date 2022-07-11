@@ -111,8 +111,10 @@ def calculate_biases(X, y):
     muh = np.expand_dims(np.nanmean(X, axis=0), axis=0)
 
     mu = tf.constant(mu, dtype=tf.dtypes.float32)
-    bw = tf.Variable(muw - mu, dtype=tf.dtypes.float32, trainable=True)
-    bh = tf.Variable(muh - mu, dtype=tf.dtypes.float32, trainable=True)
+    # bw = tf.Variable(muw - mu, dtype=tf.dtypes.float32, trainable=True)
+    # bh = tf.Variable(muh - mu, dtype=tf.dtypes.float32, trainable=True)
+    bw = tf.Variable(muw*0, dtype=tf.dtypes.float32, trainable=True)
+    bh = tf.Variable(muh*0, dtype=tf.dtypes.float32, trainable=True)
     return mu, bw, bh
 
 
@@ -178,7 +180,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
         combined_loss = self.alpha * loss_mf + (1 - self.alpha) * loss_lr
         return combined_loss, self.alpha * loss_mf, (1 - self.alpha) * loss_lr
 
-    def test_loss(self, X, Xh, yh, W, H, C):
+    def test_loss(self, X, Xh, W, H, C):
         return self.alpha * wmse(X, Xh, C) + l2_reg(W, self.lam_WH) + l2_reg(H, self.lam_WH) \
                + l2_reg(self.bw_test, self.lam_WH) + l2_reg(self.bh_train, self.lam_WH)
 
@@ -213,8 +215,8 @@ class MatrixFactorizationClassifier(BaseEstimator):
             self.Xh_test = model(self.W_test, self.H, self.mu_train, self.bw_test, self.bh_train)
             self.yh_test = logistic_regression(self.Xh_test, self.omega, self.beta)
             self.C_test = calc_C(X_test, self.yh_test)
-            mf_loss = self.test_loss(X_train, self.Xh_train, self.yh_train, self.W_train, self.H, self.C_train) \
-                      + self.test_loss(X_test, self.Xh_test, self.yh_test, self.W_test, self.H, self.C_test)
+            mf_loss = self.test_loss(X_train, self.Xh_train, self.W_train, self.H, self.C_train) \
+                      + self.test_loss(X_test, self.Xh_test, self.W_test, self.H, self.C_test)
 
         gradients = tape.gradient(mf_loss, [self.W_test, self.bw_test])
 

@@ -111,10 +111,8 @@ def calculate_biases(X, y):
     muh = np.expand_dims(np.nanmean(X, axis=0), axis=0)
 
     mu = tf.constant(mu, dtype=tf.dtypes.float32)
-    # bw = tf.Variable(muw - mu, dtype=tf.dtypes.float32, trainable=True)
-    # bh = tf.Variable(muh - mu, dtype=tf.dtypes.float32, trainable=True)
-    bw = tf.Variable(muw*0, dtype=tf.dtypes.float32, trainable=True)
-    bh = tf.Variable(muh*0, dtype=tf.dtypes.float32, trainable=True)
+    bw = tf.Variable(muw - mu, dtype=tf.dtypes.float32, trainable=True)
+    bh = tf.Variable(muh - mu, dtype=tf.dtypes.float32, trainable=True)
     return mu, bw, bh
 
 
@@ -284,7 +282,7 @@ if __name__ == "__main__":
                                              max_iter=3000,
                                              learning_rate=0.01,
                                              tol=0.0000000001,
-                                             lam_WH=0.0,
+                                             lam_WH=0.1,
                                              lam_omega=0.0)
     mf_model.fit(X_train, y_train)
     # %%

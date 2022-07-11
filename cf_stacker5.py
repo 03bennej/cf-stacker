@@ -279,10 +279,10 @@ if __name__ == "__main__":
 
     mf_model = MatrixFactorizationClassifier(latent_dim=3,
                                              alpha=0.9,
-                                             max_iter=3000,
-                                             learning_rate=0.01,
+                                             max_iter=400,
+                                             learning_rate=0.05,
                                              tol=0.0000000001,
-                                             lam_WH=0.1,
+                                             lam_WH=0.3,
                                              lam_omega=0.0)
     mf_model.fit(X_train, y_train)
     # %%

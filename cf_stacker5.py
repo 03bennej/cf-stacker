@@ -209,7 +209,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
         self.optimizer.apply_gradients(zip(gradients, [self.W_train, self.H]))
 
-        for i in range(100):
+        for i in range(10):
             with tf.GradientTape() as tape:
                 self.Xh_train = model(self.W_train, self.H, self.mu_train, self.bw_train, self.bh_train)
                 self.yh_train = logistic_regression(self.Xh_train, self.omega, self.beta)

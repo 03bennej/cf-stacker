@@ -104,8 +104,8 @@ def define_variables(X_shape, latent_dim):
 
 
 def calc_C(X, y, numpy=False):  # return binary matrix
-    C = 1 - tf.math.abs(X - y)
-    # C = tf.math.floor(1 - tf.math.abs(X - y) + 1 / 2)
+    # C = 1 - tf.math.abs(X - y)
+    C = tf.math.floor(1 - tf.math.abs(X - y) + 1 / 2)
     if numpy:
         C = C.numpy()
     return C
@@ -200,7 +200,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
     def optimization_train_step(self, X_train, y):
         with tf.GradientTape() as tape:
             self.Xh_train = model(self.W_train, self.H, self.mu_train, self.bw_train, self.bh_train)
-            self.yh_train = logistic_regression(self.Xh_train, self.omega, self.beta)
+            self.yh_train = y#logistic_regression(self.Xh_train, self.omega, self.beta)
             self.C_train = calc_C(X_train, self.yh_train)
             combined_loss, mf_loss, lr_loss = self.train_losses(X_train, self.Xh_train, y, self.yh_train, self.W_train,
                                                                 self.H, self.omega)

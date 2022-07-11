@@ -55,7 +55,7 @@ def model(W, H, mu, bw, bh):
 
 
 def logistic_regression(X, omega, beta):
-    return tf.nn.sigmoid(tf.matmul(X, omega) + beta)
+    return tf.nn.sigmoid(tf.add(tf.matmul(X, omega), beta))
 
 
 def format_lr(yh):

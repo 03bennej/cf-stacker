@@ -97,7 +97,7 @@ def define_variables(X_shape, latent_dim):
     omega = tf.Variable(initializer1(shape=[X_shape[1], 1],
                         dtype=tf.dtypes.float32),
                         trainable=True)
-    beta = tf.Variable(initializer1(shape=[1],
+    beta = tf.Variable(initializer1(shape=[1, 1],
                         dtype=tf.dtypes.float32),
                         trainable=True)
     return W, H, omega, beta

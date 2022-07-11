@@ -155,7 +155,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
         # y = np.expand_dims(y, axis=-1)
 
-        self.y = tf.constant(np.expand_dims(y, axis=-1), dtype=tf.dtypes.int32)
+        y = tf.constant(np.expand_dims(y, axis=-1), dtype=tf.dtypes.int32)
 
         self.W_train, self.H, self.omega, self.beta = define_variables(np.shape(X), self.latent_dim)
 

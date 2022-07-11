@@ -67,7 +67,7 @@ def bce_loss(y_true, y_pred):
     y_pred = tf.clip_by_value(y_pred, 1e-9, 1)
     one_minus_y_pred = tf.clip_by_value(one_minus_y_pred, 1e-9, 1)
 
-    neg_pos_ratio = 1#np.count_nonzero(y_true) / np.count_nonzero(y_true)
+    neg_pos_ratio = np.count_nonzero(y_true) / np.count_nonzero(y_true)
 
     bce = -tf.reduce_mean(
         neg_pos_ratio * y_true * tf.math.log(y_pred) + (1 - y_true) * tf.math.log(one_minus_y_pred)) / neg_pos_ratio
@@ -111,8 +111,8 @@ def calculate_biases(X, y):
     muh = np.expand_dims(np.nanmean(X, axis=0), axis=0)
 
     mu = tf.constant(mu, dtype=tf.dtypes.float32)
-    bw = tf.Variable(muw - mu, dtype=tf.dtypes.float32, trainable=True)
-    bh = tf.Variable(muh - mu, dtype=tf.dtypes.float32, trainable=True)
+    bw = tf.constant(muw - mu, dtype=tf.dtypes.float32)
+    bh = tf.constant(muh - mu, dtype=tf.dtypes.float32)
     return mu, bw, bh
 
 
@@ -191,9 +191,9 @@ class MatrixFactorizationClassifier(BaseEstimator):
             combined_loss, mf_loss, lr_loss = self.train_losses(X_train, self.Xh_train, y, self.yh_train, self.W_train,
                                                                 self.H, self.omega)
 
-        gradients = tape.gradient(mf_loss, [self.W_train, self.H, self.bw_train, self.bh_train])
+        gradients = tape.gradient(mf_loss, [self.W_train, self.H])
 
-        self.optimizer.apply_gradients(zip(gradients, [self.W_train, self.H, self.bw_train, self.bh_train]))
+        self.optimizer.apply_gradients(zip(gradients, [self.W_train, self.H]))
 
         with tf.GradientTape() as tape:
             self.Xh_train = model(self.W_train, self.H, self.mu_train, self.bw_train, self.bh_train)
@@ -216,9 +216,9 @@ class MatrixFactorizationClassifier(BaseEstimator):
             mf_loss = self.test_loss(X_train, self.Xh_train, self.W_train, self.H, self.C_train) \
                       + self.test_loss(X_test, self.Xh_test, self.W_test, self.H, self.C_test)
 
-        gradients = tape.gradient(mf_loss, [self.W_test, self.bw_test])
+        gradients = tape.gradient(mf_loss, [self.W_test])
 
-        self.optimizer.apply_gradients(zip(gradients, [self.W_test, self.bw_test]))
+        self.optimizer.apply_gradients(zip(gradients, [self.W_test]))
 
         return mf_loss
 
@@ -279,10 +279,10 @@ if __name__ == "__main__":
 
     mf_model = MatrixFactorizationClassifier(latent_dim=3,
                                              alpha=0.9,
-                                             max_iter=400,
+                                             max_iter=300,
                                              learning_rate=0.05,
                                              tol=0.0000000001,
-                                             lam_WH=0.3,
+                                             lam_WH=0.2,
                                              lam_omega=0.0)
     mf_model.fit(X_train, y_train)
     # %%

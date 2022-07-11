@@ -216,9 +216,9 @@ class MatrixFactorizationClassifier(BaseEstimator):
             mf_loss = self.test_loss(X_train, self.Xh_train, self.yh_train, self.W_train, self.H, self.C_train) \
                       + self.test_loss(X_test, self.Xh_test, self.yh_test, self.W_test, self.H, self.C_test)
 
-        gradients = tape.gradient(mf_loss, [self.W_test])
+        gradients = tape.gradient(mf_loss, [self.W_test, self.bw_test])
 
-        self.optimizer.apply_gradients(zip(gradients, [self.W_test]))
+        self.optimizer.apply_gradients(zip(gradients, [self.W_test, self.bw_test]))
 
         return mf_loss
 

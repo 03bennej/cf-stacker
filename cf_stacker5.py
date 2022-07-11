@@ -197,7 +197,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
         return self.alpha * (wmse(X, Xh, C) + l2_reg(W, self.lam_WH) + l2_reg(H, self.lam_WH)) \
                + l2_reg(self.bw_test, self.lam_WH) + l2_reg(self.bh_train, self.lam_WH)
 
-    def optimization_train_step(self, X_train, y, step):
+    def optimization_train_step(self, X_train, y):
         with tf.GradientTape() as tape:
             self.Xh_train = model(self.W_train, self.H, self.mu_train, self.bw_train, self.bh_train)
             self.yh_train = logistic_regression(self.Xh_train, self.omega, self.beta)
@@ -222,7 +222,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
         return combined_loss, mf_loss, lr_loss
 
-    def optimization_test_step(self, X_train, X_test, step):
+    def optimization_test_step(self, X_train, X_test):
         with tf.GradientTape() as tape:
             self.Xh_test = model(self.W_test, self.H, self.mu_train, self.bw_test, self.bh_train)
             self.yh_test = logistic_regression(self.Xh_test, self.omega, self.beta)
@@ -246,7 +246,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
         while combined_loss > self.tol:
 
-            combined_loss, mf_loss, lr_loss = self.optimization_train_step(X_train, y, step)
+            combined_loss, mf_loss, lr_loss = self.optimization_train_step(X_train, y)
 
             step = step + 1
 
@@ -268,7 +268,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
         while mf_loss > self.tol:
 
-            mf_loss = self.optimization_test_step(X_train, X_test, step)
+            mf_loss = self.optimization_test_step(X_train, X_test)
 
             step = step + 1
 

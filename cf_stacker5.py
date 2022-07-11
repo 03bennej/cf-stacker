@@ -146,14 +146,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
         self.learning_rate = learning_rate
         self.method = method
 
-        initial_learning_rate = 0.01
-        lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
-            initial_learning_rate,
-            decay_steps=100000,
-            decay_rate=0.96,
-            staircase=True)
-        self.optimizer = keras.optimizers.Adam(lr_schedule)
-        # self.optimizer = keras.optimizers.SGD(self.learning_rate)
+        self.optimizer = keras.optimizers.RMSprop(self.learning_rate)
 
     def fit(self, X, y):
 

@@ -51,7 +51,7 @@ def l2_reg(U, lam):
 def model(W, H, mu, bw, bh):
     X_new = tf.linalg.matmul(W, H) + mu + bw + bh
     X_new = tf.clip_by_value(X_new, 0, 1)
-    return tf.linalg.matmul(W, H) + mu + bw + bh
+    return X_new
 
 
 def logistic_regression(X, omega, beta):
@@ -191,7 +191,7 @@ class MatrixFactorizationClassifier(BaseEstimator):
         with tf.GradientTape() as tape:
             self.Xh_train = model(self.W_train, self.H, self.mu_train, self.bw_train, self.bh_train)
             self.yh_train = logistic_regression(self.Xh_train, self.omega, self.beta)
-            self.C_train = calc_C(X_train, y) # self.yh_train
+            self.C_train = calc_C(X_train, self.yh_train)
             combined_loss, mf_loss, lr_loss = self.train_losses(X_train, self.Xh_train, y, self.yh_train, self.W_train,
                                                                 self.H, self.omega)
 

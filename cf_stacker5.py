@@ -49,6 +49,8 @@ def l2_reg(U, lam):
 
 
 def model(W, H, mu, bw, bh):
+    X_new = tf.linalg.matmul(W, H) + mu + bw + bh
+    X_new = tf.clip_by_value(X_new, 0, 1)
     return tf.linalg.matmul(W, H) + mu + bw + bh
 
 
@@ -96,8 +98,8 @@ def define_variables(X_shape, latent_dim):
 
 
 def calc_C(X, y, numpy=False):  # return binary matrix
-    C = 1 - tf.math.abs(X - y)
-    # C = tf.math.floor(1 - tf.math.abs(X - y) + 1 / 2)
+    # C = 1 - tf.math.abs(X - y)
+    C = tf.math.floor(1 - tf.math.abs(X - y) + 1 / 2)
     if numpy:
         C = C.numpy()
     return C

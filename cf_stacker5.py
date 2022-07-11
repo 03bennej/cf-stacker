@@ -145,7 +145,15 @@ class MatrixFactorizationClassifier(BaseEstimator):
         self.max_iter = max_iter
         self.learning_rate = learning_rate
         self.method = method
-        self.optimizer = keras.optimizers.SGDW(self.learning_rate)
+
+        initial_learning_rate = 0.1
+        lr_schedule = tf.keras.optimizers.schedules.ExponentialDecay(
+            initial_learning_rate,
+            decay_steps=100000,
+            decay_rate=0.96,
+            staircase=True)
+        self.optimizer = keras.optimizers.SGD(lr_schedule)
+        # self.optimizer = keras.optimizers.SGD(self.learning_rate)
 
     def fit(self, X, y):
 

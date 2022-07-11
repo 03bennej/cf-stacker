@@ -73,9 +73,9 @@ def bce_loss(y_true, y_pred):
     return bce
 
 
-def define_variables(X_shape, latent_dim):
-    initializer1 = keras.initializers.RandomUniform(minval=-0.01,
-                                                    maxval=0.01,
+def define_variables(X_shape, latent_dim, mean=0.0):
+    initializer1 = keras.initializers.RandomUniform(minval=-0.01+mean,
+                                                    maxval=0.01+mean,
                                                     seed=None)
     # initializer2 = keras.initializers.RandomUniform(minval=1.01,
     #                                                maxval=0.99,
@@ -172,12 +172,13 @@ class MatrixFactorizationClassifier(BaseEstimator):
 
         # _, self.bw_test, _ = calculate_biases(X, y_predict_naive)
 
+        # self.muw_test = tf.Variable(np.mean(X, axis=1), axis=1, dtype=tf.dtypes.float32)
         muw_test = np.expand_dims(np.mean(X, axis=1), axis=1)
         self.bw_test = tf.constant(muw_test - self.mu_train, dtype=tf.dtypes.float32)
 
         self.X_test = tf.constant(X, dtype=tf.dtypes.float32)
 
-        self.W_test, _, _, _ = define_variables(np.shape(X), self.latent_dim)
+        self.W_test, _, _, _ = define_variables(np.shape(X), self.latent_dim, mean=np.mean(self.W_train))
 
         self.optimize_test(X_train=self.X_train, X_test=self.X_test)
 

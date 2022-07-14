@@ -309,7 +309,7 @@ if __name__ == "__main__":
 
 #%% C accuracy
 
-C_train_true = tf.math.floor(1 - tf.math.abs(X_train - np.expand_dims(y_train, axis=1)) + 1 / 2)
-C_train_pred = mf_model.C_train.numpy()
-
-diff = C_train_true - C_train_pred 
+# C_train_true = tf.math.floor(1 - tf.math.abs(X_train - np.expand_dims(y_train, axis=1)) + 1 / 2)
+# C_train_pred = mf_model.C_train.numpy()
+#
+# diff = C_train_true - C_train_pred

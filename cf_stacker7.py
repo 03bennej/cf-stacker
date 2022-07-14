@@ -285,7 +285,7 @@ if __name__ == "__main__":
                                              max_iter=200,
                                              learning_rate=0.01,
                                              tol=0.0000000001,
-                                             lam_WH=0.0,
+                                             lam_WH=100.0,
                                              lam_omega=0.1)
     mf_model.fit(X_train, y_train)
     # %%

@@ -50,12 +50,12 @@ def l2_reg(U, lam):
 
 def model(W, H, mu, bw, bh):
     X_new = tf.linalg.matmul(W, H) + mu + bw + bh
-    X_new = tf.clip_by_value(X_new, 0, 1)
+    # X_new = tf.clip_by_value(X_new, 0, 1)
     return X_new
 
 
 def logistic_regression(X, omega, beta):
-    return tf.nn.sigmoid(tf.add(tf.matmul(X, omega), beta))
+    return tf.nn.sigmoid(tf.add(tf.matmul(tf.linalg.normalize(X), omega), beta))
 
 
 def format_lr(yh):
@@ -67,7 +67,7 @@ def bce_loss(y_true, y_pred):
     y_pred = tf.clip_by_value(y_pred, 1e-9, 1)
     one_minus_y_pred = tf.clip_by_value(one_minus_y_pred, 1e-9, 1)
 
-    neg_pos_ratio = np.count_nonzero(y_true) / np.count_nonzero(y_true)
+    neg_pos_ratio = 1#np.count_nonzero(y_true) / np.count_nonzero(y_true)
 
     bce = -tf.reduce_mean(
         neg_pos_ratio * y_true * tf.math.log(y_pred) + (1 - y_true) * tf.math.log(one_minus_y_pred)) / neg_pos_ratio
@@ -97,6 +97,7 @@ def define_variables(X_shape, latent_dim):
 def calc_C(X, y, numpy=False):  # return binary matrix
     # C = 1 - tf.math.abs(X - y)
     C = tf.math.floor(1 - tf.math.abs(X - y) + 1 / 2)
+    # C = tf.constant(1, dtype=tf.dtypes.float32)
     if numpy:
         C = C.numpy()
     return C
@@ -237,8 +238,9 @@ class MatrixFactorizationClassifier(BaseEstimator):
             step = step + 1
 
             if step % 100 == 0:
+                f_score, _, _ = fmax_score(y, self.yh_train.numpy()[:, 0])
                 print(
-                    "epoch: %i, combined_loss: %f, mf_loss: %f, lr_loss: %f" % (step, combined_loss, mf_loss, lr_loss))
+                    "epoch: %i, combined_loss: %f, mf_loss: %f, lr_loss: %f, fmax_score %f" % (step, combined_loss, mf_loss, lr_loss, f_score))
 
             if step == self.max_iter:
                 print("Increase max_iter: unable to meet convergence criteria")
@@ -261,14 +263,13 @@ class MatrixFactorizationClassifier(BaseEstimator):
             if step % 100 == 0:
                 print("epoch: %i, mf_loss: %f" % (step, mf_loss))
 
-            if step == self.max_iter//1:
+            if step == self.max_iter:
                 print("Increase max_iter: unable to meet convergence criteria")
                 break
 
-
 if __name__ == "__main__":
-    train_data = pd.read_csv('validation-10000.csv.gz')
-    test_data = pd.read_csv('predictions-10000.csv.gz')
+    train_data = pd.read_csv('validation-10003.csv.gz')
+    test_data = pd.read_csv('predictions-10003.csv.gz')
     train_data = train_data.drop(["id"], axis=1)
     test_data = test_data.drop(["id"], axis=1)
     X_train = train_data.drop(["label"], axis=1).to_numpy()
@@ -277,19 +278,20 @@ if __name__ == "__main__":
     X_test = test_data.drop(["label"], axis=1).to_numpy()
     y_test = test_data.pop("label").to_numpy()
 
-    mf_model = MatrixFactorizationClassifier(latent_dim=3,
-                                             alpha=0.9,
+    mf_model = MatrixFactorizationClassifier(latent_dim=100,
+                                             alpha=0.1,
                                              max_iter=1000,
-                                             learning_rate=0.05,
+                                             learning_rate=0.01,
                                              tol=0.0000000001,
-                                             lam_WH=0.2,
+                                             lam_WH=0.0,
                                              lam_omega=0.0)
     mf_model.fit(X_train, y_train)
     # %%
+    mf_model.max_iter = 100
     y_pred = mf_model.predict(X_test)
 
-    sk_lr = LogisticRegression()
-    sk_lr.fit(X_test, y_test)
+    sk_lr = LogisticRegression(max_iter=100)
+    sk_lr.fit(X_train, y_train)
     sk_y_pred = sk_lr.predict_proba(X_test)[:, 1]
 
     mean_y_pred = np.mean(X_test, axis=1)
@@ -297,3 +299,10 @@ if __name__ == "__main__":
     fmax_score(y_test, y_pred, display=True)
     fmax_score(y_test, mean_y_pred, display=True)
     fmax_score(y_test, sk_y_pred, display=True)
+
+#%% C accuracy
+
+C_train_true = tf.math.floor(1 - tf.math.abs(X_train - np.expand_dims(y_train, axis=1)) + 1 / 2)
+C_train_pred = mf_model.C_train.numpy()
+
+diff = C_train_true - C_train_pred 

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 """
 Created on Mon Jun  6 15:37:28 2022
 
@@ -98,8 +99,8 @@ def define_variables(X_shape, latent_dim):
 
 def calc_C(X, y, numpy=False):  # return binary matrix
     # C = 1 - tf.math.abs(X - y)
-    # C = tf.math.floor(1 - tf.math.abs(X - y) + 0.5)
-    C = tf.constant(1, dtype=tf.dtypes.float32)
+    C = tf.math.floor(1 - tf.math.abs(X - y) + 0.5)
+    # C = tf.constant(1, dtype=tf.dtypes.float32)
     if numpy:
         C = C.numpy()
     return C
@@ -270,8 +271,8 @@ class MatrixFactorizationClassifier(BaseEstimator):
                 break
 
 if __name__ == "__main__":
-    train_data = pd.read_csv('validation-10004.csv.gz')
-    test_data = pd.read_csv('predictions-10004.csv.gz')
+    train_data = pd.read_csv('validation-10000.csv.gz')
+    test_data = pd.read_csv('predictions-10000.csv.gz')
     train_data = train_data.drop(["id"], axis=1)
     test_data = test_data.drop(["id"], axis=1)
     X_train = train_data.drop(["label"], axis=1).to_numpy()
@@ -285,7 +286,7 @@ if __name__ == "__main__":
                                              max_iter=200,
                                              learning_rate=0.01,
                                              tol=0.0000000001,
-                                             lam_WH=100.0,
+                                             lam_WH=0.0,
                                              lam_omega=0.1)
     mf_model.fit(X_train, y_train)
     # %%

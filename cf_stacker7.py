@@ -98,8 +98,8 @@ def define_variables(X_shape, latent_dim):
 
 
 def calc_C(X, y, numpy=False):  # return binary matrix
-    C = 1 - tf.math.abs(X - y)
-    # C = tf.math.floor(1 - tf.math.abs(X - y) + 0.5)
+    # C = 1 - tf.math.abs(X - y)
+    C = tf.math.floor(1 - tf.math.abs(X - y) + 0.5)
     # C = tf.constant(1, dtype=tf.dtypes.float32)
     if numpy:
         C = C.numpy()
@@ -271,8 +271,8 @@ class MatrixFactorizationClassifier(BaseEstimator):
                 break
 
 if __name__ == "__main__":
-    train_data = pd.read_csv('validation-10000.csv.gz')
-    test_data = pd.read_csv('predictions-10000.csv.gz')
+    train_data = pd.read_csv('validation-10003.csv.gz')
+    test_data = pd.read_csv('predictions-10001.csv.gz')
     train_data = train_data.drop(["id"], axis=1)
     test_data = test_data.drop(["id"], axis=1)
     X_train = train_data.drop(["label"], axis=1).to_numpy()
